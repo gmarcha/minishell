@@ -7,6 +7,8 @@
 # include <fcntl.h>
 # include <sys/wait.h>
 
+# include "libft.h"
+
 # define BUFFER_SIZE	4096
 
 void		*ft_free_strs(char **strs);
