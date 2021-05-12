@@ -1,7 +1,8 @@
 NAME		=	minishell
 CC			=	gcc
 FLAGS		=	-Wall -Wextra -Werror
-INC			=	-I ./inc
+INC			=	-I ./inc -I ./libft
+libft		=	-L ./libft -lft
 OBJ			=	$(patsubst src%, obj%, $(SRC:.c=.o))
 SRC			=	src/ft_free_strs.c \
 				src/ft_ischarset.c \
@@ -15,6 +16,7 @@ SRC			=	src/ft_free_strs.c \
 all:		$(NAME)
 
 $(NAME):	$(OBJ)
+			make -C libft
 			$(CC) $(FLAGS) -fsanitize=address -o $@ $^
 
 obj/%.o:	src/%.c
@@ -26,9 +28,11 @@ run:
 			@rm -rf a.out
 
 clean:
+			make $@ -C libft
 			rm -rf $(OBJ)
 
 fclean:		clean
+			make $@ -C libft
 			rm -rf $(OBJ)
 
 re:			fclean all
