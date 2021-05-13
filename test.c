@@ -56,7 +56,9 @@ int	main(void)
 	int			fd = open("test_file", O_RDONLY);
 	void		*ta_daronne;
 
-	mtrace();
+	#ifdef DEBUG
+		mtrace();
+	#endif
 	if (fd == -1)
 		die("test_file", errno);
 	close(fd);
@@ -68,6 +70,8 @@ int	main(void)
 	if (ta_daronne == 0)
 		die("virtual memory exceeded", errno);
 	free(ta_daronne);
-	muntrace();
+	#ifdef DEBUG
+		muntrace();
+	#endif
 	return (0);
 }
