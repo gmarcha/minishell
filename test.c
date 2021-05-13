@@ -51,7 +51,7 @@ void	test_stat(void)
 	printf("%ld\n", statbuf.st_ctime);
 }
 
-int	main(void)
+int	exec(char *const cat_args[], char *const grep_args[])
 {
 	int		p_fd[2];
 	pid_t	child1;
@@ -68,7 +68,7 @@ int	main(void)
 			die("dup2()", errno);
 		close(p_fd[0]);
 		close(p_fd[1]);
-		if (execve("/usr/bin/cat", (char *const []){"cat", "test_file", 0}, 0) == -1)
+		if (execve("/usr/bin/cat", cat_args, 0) == -1)
 			die("execve()", errno);
 	}
 	else
@@ -82,7 +82,7 @@ int	main(void)
 				die("dup2()", errno);
 			close(p_fd[0]);
 			close(p_fd[1]);
-			if (execve("/usr/bin/grep", (char *const []){"grep", "42", 0}, 0) == -1)
+			if (execve("/usr/bin/grep", grep_args, 0) == -1)
 				die("execve()", errno);
 		}
 		else
@@ -94,4 +94,15 @@ int	main(void)
 		}
 	}
 	return (0);
+}
+
+int	main(void)
+{
+	int				ret;
+
+	ret = exec(
+		(char *const []){"cat", "test_file", 0},
+		(char *const []){"grep", "42", 0}
+	);
+	printf("%d\n", ret);
 }
