@@ -6,6 +6,8 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+#include <mcheck.h>
+
 #include "libft/libft.h"
 
 #define PROGRAM_NAME	"test"
@@ -52,9 +54,20 @@ void	test_stat(void)
 int	main(void)
 {
 	int			fd = open("test_file", O_RDONLY);
+	void		*ta_daronne;
 
+	mtrace();
 	if (fd == -1)
 		die("test_file", errno);
 	close(fd);
+	ta_daronne = malloc(sizeof(*ta_daronne));
+	if (ta_daronne == 0)
+		die("virtual memory exceeded", errno);
+	free(ta_daronne);
+	ta_daronne = malloc(sizeof(*ta_daronne) * 42);
+	if (ta_daronne == 0)
+		die("virtual memory exceeded", errno);
+	free(ta_daronne);
+	muntrace();
 	return (0);
 }
