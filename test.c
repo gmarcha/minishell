@@ -27,12 +27,12 @@ void	die(char *errmsg, int errnum)
 		ft_putstr_fd(strerror(errnum), 2);
 	}
 	ft_putendl_fd("", 2);
-	exit(0);
+	exit(1);
 }
 
 void	test_stat(void)
 {
-	struct stat	statbuf;
+	struct stat		statbuf;
 
 	if (stat("test_file", &statbuf) == -1)
 		die("fstat", errno);
@@ -53,25 +53,45 @@ void	test_stat(void)
 
 int	main(void)
 {
-	int			fd = open("test_file", O_RDONLY);
-	void		*ta_daronne;
+	int		p_fd[2];
+	pid_t	child1;
+	pid_t	child2;
 
-	#ifdef DEBUG
-		mtrace();
-	#endif
-	if (fd == -1)
-		die("test_file", errno);
-	close(fd);
-	ta_daronne = malloc(sizeof(*ta_daronne));
-	if (ta_daronne == 0)
-		die("virtual memory exceeded", errno);
-	free(ta_daronne);
-	ta_daronne = malloc(sizeof(*ta_daronne) * 42);
-	if (ta_daronne == 0)
-		die("virtual memory exceeded", errno);
-	free(ta_daronne);
-	#ifdef DEBUG
-		muntrace();
-	#endif
+	if (pipe(p_fd) == -1)
+		die("pipe()", errno);
+	child1 = fork();
+	if (child1 == -1)
+		die("fork()", errno);
+	else if (child1 == 0)
+	{
+		if (dup2(p_fd[1], 1) == -1)
+			die("dup2()", errno);
+		close(p_fd[0]);
+		close(p_fd[1]);
+		if (execve("/usr/bin/cat", (char *const []){"cat", "test_file", 0}, 0) == -1)
+			die("execve()", errno);
+	}
+	else
+	{
+		child2 = fork();
+		if (child2 == -1)
+			die("fork()", errno);
+		else if (child2 == 0)
+		{
+			if (dup2(p_fd[0], 0) == -1)
+				die("dup2()", errno);
+			close(p_fd[0]);
+			close(p_fd[1]);
+			if (execve("/usr/bin/grep", (char *const []){"grep", "42", 0}, 0) == -1)
+				die("execve()", errno);
+		}
+		else
+		{
+			close(p_fd[0]);
+			close(p_fd[1]);
+			wait(0);
+			wait(0);
+		}
+	}
 	return (0);
 }

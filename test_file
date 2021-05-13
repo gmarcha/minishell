@@ -1,6 +1,3 @@
-= Start
-@ ./a.out:[0x56219b6ef56b] + 0x56219cbb0690 0x1
-@ ./a.out:[0x56219b6ef597] - 0x56219cbb0690
-@ ./a.out:[0x56219b6ef5a1] + 0x56219cbb06b0 0x2a
-@ ./a.out:[0x56219b6ef5cd] - 0x56219cbb06b0
-= End
+42 test
+next try
+im not mad about 42
