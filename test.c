@@ -2,6 +2,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <dirent.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -19,6 +20,16 @@ typedef struct s_cmd
 	int				out_fd;
 }					t_cmd;
 
+void	*ft_free_strs(char **strs)
+{
+	size_t			i;
+
+	i = 0;
+	while (strs[i])
+		free(strs[i++]);
+	free(strs);
+	return (0);
+}
 
 void	die(char *errmsg, int errnum)
 {
@@ -87,11 +98,45 @@ void	xexecve(char *pathname, char *const *args, char *const *env)
 	die("execve()", errno);
 }
 
-int	exec(t_cmd *cmd, int nb_cmd)
+int	ispath(char *dir_name, char *file_name)
+{
+	DIR				*dir;
+	struct dirent	*ent;
+
+	dir = opendir(dir_name);
+	if (dir == 0)
+	{
+		if (errno == ENOENT)
+			return (0);
+		die("opendir()", errno);
+	}
+	while (1)
+	{
+		errno = 0;
+		ent = readdir(dir);
+		if (ent == 0 && errno != 0)
+			die("readdir()", errno);
+		if (ent == 0)
+			break ;
+		if (ft_strncmp(ent->d_name, ".", 1) == 0 || ft_strncmp(ent->d_name, "..", 2) == 0)
+			continue ;
+		if (ft_strncmp(ent->d_name, file_name, 260) == 0)
+		{
+			closedir(dir);
+			return (1);
+		}
+	}
+	closedir(dir);
+	return (0);
+}
+
+int	exec(t_cmd *cmd, int nb_cmd, char **envp)
 {
 	int		p_fd[2];
 	pid_t	pid;
+	char	**env_path;
 	int		i;
+	int		j;
 
 	i = 0;
 	while (i < nb_cmd)
@@ -117,7 +162,24 @@ int	exec(t_cmd *cmd, int nb_cmd)
 				close(cmd[i].out_fd);
 				close(cmd[i + 1].in_fd);
 			}
-			xexecve(cmd[i].args[0], cmd[i].args, 0);
+			env_path = ft_split(getenv("PATH"), ':');
+			if (env_path == 0)
+				die("ft_split()", errno);
+			j = 0;
+			while (env_path[j])
+			{
+				if (ispath(env_path[j], cmd[i].args[0]) == 1)
+				{
+					char		*tmp;
+					tmp = ft_strjoin(env_path[j], "/");
+					free(env_path[j]);
+					env_path[j] = tmp;
+					xexecve(ft_strjoin(env_path[j], cmd[i].args[0]), cmd[i].args, envp);
+				}
+				j++;
+			}
+			ft_free_strs(env_path);
+			xexecve(cmd[i].args[0], cmd[i].args, envp);
 		}
 		else
 		{
@@ -131,25 +193,26 @@ int	exec(t_cmd *cmd, int nb_cmd)
 	return (0);
 }
 
-int	main(void)
+int	main(int argc, char **argv, char **envp)
 {
+	(void)argc;(void)argv;
 	t_cmd			cmd[] = {
 		{
-			.args = (char *[]){"/usr/bin/cat", "test_file.c", 0},
+			.args = (char *[]){"cat", "test_file.c", 0},
 			.in_fd = 0,
 			.out_fd = 1
 		},
 		{
-			.args = (char *[]){"/usr/bin/grep", "include", 0},
+			.args = (char *[]){"grep", "include", 0},
 			.in_fd = 0,
 			.out_fd = 1
 		},
 		{
-			.args = (char *[]){"/usr/bin/awk", "{count++} END {print count}", 0},
+			.args = (char *[]){"awk", "{count++} END {print count}", 0},
 			.in_fd = 0,
 			.out_fd = 1
 		}
 	};
-	exec(cmd, sizeof(cmd) / sizeof(cmd[0]));
+	exec(cmd, sizeof(cmd) / sizeof(cmd[0]), envp);
 	return (0);
 }
