@@ -12,6 +12,14 @@
 
 #define PROGRAM_NAME	"test"
 
+typedef struct s_cmd
+{
+	char			**args;
+	int				in_fd;
+	int				out_fd;
+}					t_cmd;
+
+
 void	die(char *errmsg, int errnum)
 {
 	if (errmsg || errnum)
@@ -79,37 +87,45 @@ void	xexecve(char *pathname, char *const *args, char *const *env)
 	die("execve()", errno);
 }
 
-int	exec(char *const cat_args[], char *const grep_args[])
+int	exec(t_cmd *cmd, int nb_cmd)
 {
 	int		p_fd[2];
-	pid_t	child1;
-	pid_t	child2;
+	pid_t	pid;
+	int		i;
 
-	xpipe(p_fd);
-	child1 = xfork();
-	if (child1 == 0)
+	i = 0;
+	while (i < nb_cmd)
 	{
-		xdup2(p_fd[1], 1);
-		close(p_fd[0]);
-		close(p_fd[1]);
-		xexecve("/usr/bin/cat", cat_args, 0);
-	}
-	else
-	{
-		child2 = xfork();
-		if (child2 == 0)
+		if (i < nb_cmd - 1)
 		{
-			xdup2(p_fd[0], 0);
-			close(p_fd[0]);
-			close(p_fd[1]);
-			xexecve("/usr/bin/grep", grep_args, 0);
+			xpipe(p_fd);
+			cmd[i].out_fd = p_fd[1];
+			cmd[i + 1].in_fd = p_fd[0];
+		}
+		pid = xfork();
+		if (pid == 0)
+		{
+			if (i != 0)
+			{
+				xdup2(cmd[i].in_fd, 0);
+				close(cmd[i].in_fd);
+				close(cmd[i - 1].out_fd);
+			}
+			if (i < nb_cmd - 1)
+			{
+				xdup2(cmd[i].out_fd, 1);
+				close(cmd[i].out_fd);
+				close(cmd[i + 1].in_fd);
+			}
+			xexecve(cmd[i].args[0], cmd[i].args, 0);
 		}
 		else
 		{
-			close(p_fd[0]);
-			close(p_fd[1]);
-			wait(0);
-			wait(0);
+			if (cmd[i].in_fd != 0)
+				close(cmd[i].in_fd);
+			if (cmd[i].out_fd != 1)
+				close(cmd[i].out_fd);
+			i++;
 		}
 	}
 	return (0);
@@ -117,9 +133,23 @@ int	exec(char *const cat_args[], char *const grep_args[])
 
 int	main(void)
 {
-	exec(
-		(char *const []){"cat", "test_file.c", 0},
-		(char *const []){"grep", "main", 0}
-	);
+	t_cmd			cmd[] = {
+		{
+			.args = (char *[]){"/usr/bin/cat", "test_file.c", 0},
+			.in_fd = 0,
+			.out_fd = 1
+		},
+		{
+			.args = (char *[]){"/usr/bin/grep", "include", 0},
+			.in_fd = 0,
+			.out_fd = 1
+		},
+		{
+			.args = (char *[]){"/usr/bin/awk", "{count++} END {print count}", 0},
+			.in_fd = 0,
+			.out_fd = 1
+		}
+	};
+	exec(cmd, sizeof(cmd) / sizeof(cmd[0]));
 	return (0);
 }
