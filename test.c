@@ -98,10 +98,9 @@ void	xexecve(char *pathname, char *const *args, char *const *env)
 	die("execve()", errno);
 }
 
-int	ispath(char *dir_name, char *file_name)
+DIR	*xopendir(char *dir_name)
 {
 	DIR				*dir;
-	struct dirent	*ent;
 
 	dir = opendir(dir_name);
 	if (dir == 0)
@@ -110,33 +109,116 @@ int	ispath(char *dir_name, char *file_name)
 			return (0);
 		die("opendir()", errno);
 	}
-	while (1)
+	return (dir);
+}
+
+struct dirent	*xreaddir(DIR *dir)
+{
+	struct dirent	*ent;
+
+	errno = 0;
+	ent = readdir(dir);
+	if (ent == 0 && errno != 0)
+		die("readdir()", errno);
+	return (ent);
+}
+
+int	exec_echo(t_cmd cmd)
+{
+	int				i;
+	int				opt;
+
+	opt = 0;
+	if (cmd.args[1] && ft_strncmp(cmd.args[1], "-n", 3) == 0)
 	{
-		errno = 0;
-		ent = readdir(dir);
-		if (ent == 0 && errno != 0)
-			die("readdir()", errno);
-		if (ent == 0)
-			break ;
-		if (ft_strncmp(ent->d_name, ".", 1) == 0 || ft_strncmp(ent->d_name, "..", 2) == 0)
-			continue ;
-		if (ft_strncmp(ent->d_name, file_name, 260) == 0)
-		{
-			closedir(dir);
-			return (1);
-		}
+		opt = 1;
+		cmd.args++;
 	}
-	closedir(dir);
+	i = 1;
+	while (cmd.args[i])
+	{
+		if (i > 1)
+			ft_putstr_fd(" ", cmd.out_fd);
+		ft_putstr_fd(cmd.args[i], cmd.out_fd);
+		i++;
+	}
+	if (opt == 0)
+		ft_putstr_fd("\n", cmd.out_fd);
+	return (1);
+}
+
+int	isbuiltin(t_cmd cmd)
+{
+	if (ft_strncmp(cmd.args[0], "echo", 5) == 0)
+		return (exec_echo(cmd));
+	// if (ft_strncmp(cmd.args[0], "cd", 3) == 0)
+	// 	return (exec_cd(cmd));
+	// if (ft_strncmp(cmd.args[0], "pwd", 4) == 0)
+	// 	return (exec_pwd(cmd));
+	// if (ft_strncmp(cmd.args[0], "export", 7) == 0)
+	// 	return (exec_export(cmd));
+	// if (ft_strncmp(cmd.args[0], "unset", 6) == 0)
+	// 	return (exec_unset(cmd));
+	// if (ft_strncmp(cmd.args[0], "env", 4) == 0)
+	// 	return (exec_env(cmd));
+	// if (ft_strncmp(cmd.args[0], "exit", 5) == 0)
+	// 	return (exec_exit(cmd));
 	return (0);
 }
 
-int	exec(t_cmd *cmd, int nb_cmd, char **envp)
+int	ispath(char *dir_name, char *file_name)
+{
+	DIR				*dir;
+	struct dirent	*ent;
+
+	dir = xopendir(dir_name);
+	if (dir == 0)
+		return (0);
+	while (1)
+	{
+		ent = xreaddir(dir);
+		if (ent == 0)
+			break ;
+		if (ft_strncmp(ent->d_name, ".", 2) == 0 || ft_strncmp(ent->d_name, "..", 3) == 0)
+			continue ;
+		if (ft_strncmp(ent->d_name, file_name, 260) == 0)
+			return (closedir(dir) * 0 + 1);
+	}
+	return (closedir(dir) * 0);
+}
+
+void	exec(t_cmd cmd, char **envp)
+{
+	char	**env_path;
+	char	*tmp;
+	int		j;
+
+	if (isbuiltin(cmd))
+		exit(0);
+	env_path = ft_split(getenv("PATH"), ':');
+	if (env_path == 0)
+		die("ft_split()", errno);
+	j = 0;
+	while (env_path[j])
+	{
+		if (ispath(env_path[j], cmd.args[0]) == 1)
+		{
+			tmp = ft_strjoin(env_path[j], "/");
+			free(env_path[j]);
+			env_path[j] = tmp;
+			xexecve(ft_strjoin(env_path[j], cmd.args[0]), cmd.args, envp);
+		}
+		j++;
+	}
+	ft_free_strs(env_path);
+	xexecve(cmd.args[0], cmd.args, envp);
+}
+
+int	launch(t_cmd *cmd, int nb_cmd, char **envp)
 {
 	int		p_fd[2];
 	pid_t	pid;
-	char	**env_path;
 	int		i;
-	int		j;
 
 	i = 0;
 	while (i < nb_cmd)
@@ -162,24 +244,7 @@ int	exec(t_cmd *cmd, int nb_cmd, char **envp)
 				close(cmd[i].out_fd);
 				close(cmd[i + 1].in_fd);
 			}
-			env_path = ft_split(getenv("PATH"), ':');
-			if (env_path == 0)
-				die("ft_split()", errno);
-			j = 0;
-			while (env_path[j])
-			{
-				if (ispath(env_path[j], cmd[i].args[0]) == 1)
-				{
-					char		*tmp;
-					tmp = ft_strjoin(env_path[j], "/");
-					free(env_path[j]);
-					env_path[j] = tmp;
-					xexecve(ft_strjoin(env_path[j], cmd[i].args[0]), cmd[i].args, envp);
-				}
-				j++;
-			}
-			ft_free_strs(env_path);
-			xexecve(cmd[i].args[0], cmd[i].args, envp);
+			exec(cmd[i], envp);
 		}
 		else
 		{
@@ -196,23 +261,30 @@ int	exec(t_cmd *cmd, int nb_cmd, char **envp)
 int	main(int argc, char **argv, char **envp)
 {
 	(void)argc;(void)argv;
+	// t_cmd			cmd[] = {
+	// 	{
+	// 		.args = (char *[]){"cat", "test_file", 0},
+	// 		.in_fd = 0,
+	// 		.out_fd = 1
+	// 	},
+	// 	{
+	// 		.args = (char *[]){"grep", "include", 0},
+	// 		.in_fd = 0,
+	// 		.out_fd = 1
+	// 	},
+	// 	{
+	// 		.args = (char *[]){"awk", "{count++} END {print count}", 0},
+	// 		.in_fd = 0,
+	// 		.out_fd = 1
+	// 	}
+	// };
 	t_cmd			cmd[] = {
 		{
-			.args = (char *[]){"cat", "test_file.c", 0},
-			.in_fd = 0,
-			.out_fd = 1
-		},
-		{
-			.args = (char *[]){"grep", "include", 0},
-			.in_fd = 0,
-			.out_fd = 1
-		},
-		{
-			.args = (char *[]){"awk", "{count++} END {print count}", 0},
+			.args = (char *[]){"echo", "j'aime", "beaucoup", "l'ecole", 0},
 			.in_fd = 0,
 			.out_fd = 1
 		}
 	};
-	exec(cmd, sizeof(cmd) / sizeof(cmd[0]), envp);
+	launch(cmd, sizeof(cmd) / sizeof(cmd[0]), envp);
 	return (0);
 }
