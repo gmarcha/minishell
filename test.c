@@ -51,39 +51,58 @@ void	test_stat(void)
 	printf("%ld\n", statbuf.st_ctime);
 }
 
+pid_t	xfork(void)
+{
+	pid_t			child;
+
+	child = fork();
+	if (child == (pid_t)-1)
+		die("fork()", errno);
+	return (child);
+}
+
+void	xpipe(int p_fd[])
+{
+	if (pipe(p_fd) == -1)
+		die("pipe()", errno);
+}
+
+void	xdup2(int fd, int _fileno)
+{
+	if (dup2(fd, _fileno) == -1)
+		die("dup2()", errno);
+}
+
+void	xexecve(char *pathname, char *const *args, char *const *env)
+{
+	execve(pathname, args, env);
+	die("execve()", errno);
+}
+
 int	exec(char *const cat_args[], char *const grep_args[])
 {
 	int		p_fd[2];
 	pid_t	child1;
 	pid_t	child2;
 
-	if (pipe(p_fd) == -1)
-		die("pipe()", errno);
-	child1 = fork();
-	if (child1 == -1)
-		die("fork()", errno);
-	else if (child1 == 0)
+	xpipe(p_fd);
+	child1 = xfork();
+	if (child1 == 0)
 	{
-		if (dup2(p_fd[1], 1) == -1)
-			die("dup2()", errno);
+		xdup2(p_fd[1], 1);
 		close(p_fd[0]);
 		close(p_fd[1]);
-		if (execve("/usr/bin/cat", cat_args, 0) == -1)
-			die("execve()", errno);
+		xexecve("/usr/bin/cat", cat_args, 0);
 	}
 	else
 	{
-		child2 = fork();
-		if (child2 == -1)
-			die("fork()", errno);
-		else if (child2 == 0)
+		child2 = xfork();
+		if (child2 == 0)
 		{
-			if (dup2(p_fd[0], 0) == -1)
-				die("dup2()", errno);
+			xdup2(p_fd[0], 0);
 			close(p_fd[0]);
 			close(p_fd[1]);
-			if (execve("/usr/bin/grep", grep_args, 0) == -1)
-				die("execve()", errno);
+			xexecve("/usr/bin/grep", grep_args, 0);
 		}
 		else
 		{
@@ -98,11 +117,9 @@ int	exec(char *const cat_args[], char *const grep_args[])
 
 int	main(void)
 {
-	int				ret;
-
-	ret = exec(
-		(char *const []){"cat", "test_file", 0},
-		(char *const []){"grep", "42", 0}
+	exec(
+		(char *const []){"cat", "test_file.c", 0},
+		(char *const []){"grep", "main", 0}
 	);
-	printf("%d\n", ret);
+	return (0);
 }
