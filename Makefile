@@ -7,17 +7,15 @@ OBJ			=	$(patsubst src%, obj%, $(SRC:.c=.o))
 SRC			=	src/ft_free_strs.c \
 				src/ft_ischarset.c \
 				src/ft_strclen.c \
-				src/ft_strlcpy.c \
 				src/minishell.c \
 				src/shell_line.c \
-				src/shell_split.c \
-				src/utils.c
+				src/shell_split.c
 
 all:		$(NAME)
 
 $(NAME):	$(OBJ)
 			make -C libft
-			$(CC) $(FLAGS) -fsanitize=address -o $@ $^
+			$(CC) $(FLAGS) -fsanitize=address -o $@ $^ -L ./libft -lft
 
 obj/%.o:	src/%.c
 			$(CC) $(FLAGS) $(INC) -o $@ -c $<
@@ -33,7 +31,7 @@ clean:
 
 fclean:		clean
 			make $@ -C libft
-			rm -rf $(OBJ)
+			rm -rf $(NAME)
 
 re:			fclean all
 

@@ -14,13 +14,6 @@
 void		*ft_free_strs(char **strs);
 int			ft_ischarset(int c, const char *charset);
 size_t		ft_strclen(const char *s, const char *charset);
-size_t		ft_strlcpy(char *dest, const char *src, size_t size);
-
-int			ft_strlen(const char *s);
-char		*ft_strchr(char *s, int c);
-char		*ft_strdup(char *s);
-char		*ft_strjoin(char *s1, char *s2);
-char		*ft_substr(char *s, unsigned int start, unsigned int len);
 
 int			shell_line(int fd, char **line);
 

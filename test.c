@@ -4,10 +4,9 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include <errno.h>
+#include <termios.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
-
-#include <mcheck.h>
 
 #include "libft/libft.h"
 
@@ -31,10 +30,10 @@ void	*ft_free_strs(char **strs)
 	return (0);
 }
 
-void	die(char *errmsg, int errnum)
+void	die(char *name, char *errmsg, int errnum)
 {
 	if (errmsg || errnum)
-		ft_putstr_fd(PROGRAM_NAME, 2);
+		ft_putstr_fd(name, 2);
 	if (errmsg)
 	{
 		ft_putstr_fd(": ", 2);
@@ -46,28 +45,8 @@ void	die(char *errmsg, int errnum)
 		ft_putstr_fd(strerror(errnum), 2);
 	}
 	ft_putendl_fd("", 2);
+
 	exit(1);
-}
-
-void	test_stat(void)
-{
-	struct stat		statbuf;
-
-	if (stat("test_file", &statbuf) == -1)
-		die("fstat", errno);
-	printf("%lu\n", statbuf.st_dev);
-	printf("%lu\n", statbuf.st_ino);
-	printf("%u\n", statbuf.st_mode);
-	printf("%lu\n", statbuf.st_nlink);
-	printf("%u\n", statbuf.st_uid);
-	printf("%u\n", statbuf.st_gid);
-	printf("%lu\n", statbuf.st_rdev);
-	printf("%ld\n", statbuf.st_size);
-	printf("%ld\n", statbuf.st_blksize);
-	printf("%ld\n", statbuf.st_blocks);
-	printf("%ld\n", statbuf.st_atime);
-	printf("%ld\n", statbuf.st_mtime);
-	printf("%ld\n", statbuf.st_ctime);
 }
 
 pid_t	xfork(void)
@@ -76,26 +55,26 @@ pid_t	xfork(void)
 
 	child = fork();
 	if (child == (pid_t)-1)
-		die("fork()", errno);
+		die(PROGRAM_NAME, "fork()", errno);
 	return (child);
 }
 
 void	xpipe(int p_fd[])
 {
 	if (pipe(p_fd) == -1)
-		die("pipe()", errno);
+		die(PROGRAM_NAME, "pipe()", errno);
 }
 
 void	xdup2(int fd, int _fileno)
 {
 	if (dup2(fd, _fileno) == -1)
-		die("dup2()", errno);
+		die(PROGRAM_NAME, "dup2()", errno);
 }
 
 void	xexecve(char *pathname, char *const *args, char *const *env)
 {
 	execve(pathname, args, env);
-	die("execve()", errno);
+	die(PROGRAM_NAME, "execve()", errno);
 }
 
 DIR	*xopendir(char *dir_name)
@@ -107,7 +86,7 @@ DIR	*xopendir(char *dir_name)
 	{
 		if (errno == ENOENT)
 			return (0);
-		die("opendir()", errno);
+		die(PROGRAM_NAME, "opendir()", errno);
 	}
 	return (dir);
 }
@@ -119,7 +98,7 @@ struct dirent	*xreaddir(DIR *dir)
 	errno = 0;
 	ent = readdir(dir);
 	if (ent == 0 && errno != 0)
-		die("readdir()", errno);
+		die(PROGRAM_NAME, "readdir()", errno);
 	return (ent);
 }
 
@@ -143,18 +122,65 @@ int	exec_echo(t_cmd cmd)
 		i++;
 	}
 	if (opt == 0)
-		ft_putstr_fd("\n", cmd.out_fd);
+		ft_putendl_fd("", cmd.out_fd);
 	return (1);
 }
+
+int	exec_cd(t_cmd cmd)
+{
+	if (cmd.args[1] == 0)
+	{
+		if (chdir(getenv("HOME")) == -1)
+			die(PROGRAM_NAME, "chdir()", errno);
+		exit(0);
+	}
+	if (cmd.args[2] != 0)
+		die("cd", "too many arguments", 0);
+	if (chdir(cmd.args[1]) == -1)
+		die(PROGRAM_NAME, "chdir()", errno);
+	return (1);
+}
+
+int	exec_pwd(t_cmd cmd)
+{
+	char			buf[1024];
+
+	if (cmd.args[1] != 0)
+		die("pwd", "too many arguments", 0);
+	if (getcwd(buf, sizeof(buf)) == 0)
+		die(PROGRAM_NAME, "getcwd()", errno);
+	ft_putendl_fd(buf, cmd.out_fd);
+	return (1);
+}
+
+// int	exec_export(t_cmd cmd)
+// {
+// 	return (1);
+// }
+
+// int	exec_unset(t_cmd cmd)
+// {
+// 	return (1);
+// }
+
+// int	exec_env(t_cmd cmd)
+// {
+// 	return (1);
+// }
+
+// int	exec_exit(t_cmd cmd)
+// {
+// 	return (1);
+// }
 
 int	isbuiltin(t_cmd cmd)
 {
 	if (ft_strncmp(cmd.args[0], "echo", 5) == 0)
 		return (exec_echo(cmd));
-	// if (ft_strncmp(cmd.args[0], "cd", 3) == 0)
-	// 	return (exec_cd(cmd));
-	// if (ft_strncmp(cmd.args[0], "pwd", 4) == 0)
-	// 	return (exec_pwd(cmd));
+	if (ft_strncmp(cmd.args[0], "cd", 3) == 0)
+		return (exec_cd(cmd));
+	if (ft_strncmp(cmd.args[0], "pwd", 4) == 0)
+		return (exec_pwd(cmd));
 	// if (ft_strncmp(cmd.args[0], "export", 7) == 0)
 	// 	return (exec_export(cmd));
 	// if (ft_strncmp(cmd.args[0], "unset", 6) == 0)
@@ -197,7 +223,7 @@ void	exec(t_cmd cmd, char **envp)
 		exit(0);
 	env_path = ft_split(getenv("PATH"), ':');
 	if (env_path == 0)
-		die("ft_split()", errno);
+		die(PROGRAM_NAME, "ft_split()", errno);
 	j = 0;
 	while (env_path[j])
 	{
@@ -260,7 +286,14 @@ int	launch(t_cmd *cmd, int nb_cmd, char **envp)
 
 int	main(int argc, char **argv, char **envp)
 {
-	(void)argc;(void)argv;
+	(void)argc;(void)argv;(void)envp;
+	// t_cmd			cmd[] = {
+	// 	{
+	// 		.args = (char *[]){"cd", "libftnu", 0},
+	// 		.in_fd = 0,
+	// 		.out_fd = 1
+	// 	}
+	// };
 	// t_cmd			cmd[] = {
 	// 	{
 	// 		.args = (char *[]){"cat", "test_file", 0},
@@ -278,13 +311,10 @@ int	main(int argc, char **argv, char **envp)
 	// 		.out_fd = 1
 	// 	}
 	// };
-	t_cmd			cmd[] = {
-		{
-			.args = (char *[]){"echo", "j'aime", "beaucoup", "l'ecole", 0},
-			.in_fd = 0,
-			.out_fd = 1
-		}
-	};
-	launch(cmd, sizeof(cmd) / sizeof(cmd[0]), envp);
+	// launch(cmd, sizeof(cmd) / sizeof(cmd[0]), envp);
+
+	// struct termios	*termios_p;
+
+	printf("%s\n", ttyname(1));
 	return (0);
 }
