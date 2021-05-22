@@ -18,6 +18,7 @@ $(NAME):	$(OBJ)
 			$(CC) $(FLAGS) -fsanitize=address -o $@ $^ -L ./libft -lft
 
 obj/%.o:	src/%.c
+			@mkdir -p obj
 			$(CC) $(FLAGS) $(INC) -o $@ -c $<
 
 run:
