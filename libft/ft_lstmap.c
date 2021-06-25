@@ -20,7 +20,7 @@ static void	*ft_freelst(t_list *lst, void (*del)(void *))
 	{
 		tmp = lst;
 		lst = lst->next;
-		if (tmp->content)
+		if (del)
 			del(tmp->content);
 		free(tmp);
 	}

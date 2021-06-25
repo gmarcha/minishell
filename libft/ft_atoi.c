@@ -21,8 +21,7 @@ int	ft_atoi(const char *nptr)
 		i++;
 	sign = 1;
 	if (nptr[i] == '+' || nptr[i] == '-')
-		if (nptr[i++] == '-')
-			sign *= -1;
+		sign *= (nptr[i++] & 2) - 1;
 	result = 0;
 	while (nptr[i] >= '0' && nptr[i] <= '9')
 		result = result * 10 + nptr[i++] - 48;
