@@ -294,27 +294,27 @@ int	main(int argc, char **argv, char **envp)
 	// 		.out_fd = 1
 	// 	}
 	// };
-	// t_cmd			cmd[] = {
-	// 	{
-	// 		.args = (char *[]){"cat", "test_file", 0},
-	// 		.in_fd = 0,
-	// 		.out_fd = 1
-	// 	},
-	// 	{
-	// 		.args = (char *[]){"grep", "include", 0},
-	// 		.in_fd = 0,
-	// 		.out_fd = 1
-	// 	},
-	// 	{
-	// 		.args = (char *[]){"awk", "{count++} END {print count}", 0},
-	// 		.in_fd = 0,
-	// 		.out_fd = 1
-	// 	}
-	// };
-	// launch(cmd, sizeof(cmd) / sizeof(cmd[0]), envp);
+	t_cmd			cmd[] = {
+		{
+			.args = (char *[]){"cat", "test_file", 0},
+			.in_fd = 0,
+			.out_fd = 1
+		},
+		{
+			.args = (char *[]){"grep", "include", 0},
+			.in_fd = 0,
+			.out_fd = 1
+		},
+		{
+			.args = (char *[]){"awk", "{count++} END {print count}", 0},
+			.in_fd = 0,
+			.out_fd = 1
+		}
+	};
+	launch(cmd, sizeof(cmd) / sizeof(cmd[0]), envp);
 
 	// struct termios	*termios_p;
 
-	printf("%s\n", ttyname(1));
+	// printf("%s\n", ttyname(1));
 	return (0);
 }
