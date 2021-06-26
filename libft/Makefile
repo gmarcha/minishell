@@ -2,7 +2,10 @@ NAME		= libft.a
 CC			= gcc
 FLAGS		= -Wall -Wextra -Werror
 OBJ			= $(SRC:.c=.o)
-SRC			= 	ft_atoi_base.c \
+SRC			= 	free_index.c \
+				free_mem_alloc.c \
+				free_wrap.c \
+				ft_atoi_base.c \
 				ft_atoi.c \
 				ft_atol.c \
 				ft_bzero.c \
@@ -24,6 +27,7 @@ SRC			= 	ft_atoi_base.c \
 				ft_lstadd_back.c \
 				ft_lstadd_front.c \
 				ft_lstclear.c \
+				ft_lstdel_front.c \
 				ft_lstdelone.c \
 				ft_lstiter.c \
 				ft_lstlast.c \
@@ -62,7 +66,12 @@ SRC			= 	ft_atoi_base.c \
 				ft_strtrim.c \
 				ft_substr.c \
 				ft_tolower.c \
-				ft_toupper.c
+				ft_toupper.c \
+				malloc_clear.c \
+				malloc_destroy.c \
+				malloc_get.c \
+				malloc_index.c \
+				malloc_wrap.c
 
 all:		$(NAME)
 

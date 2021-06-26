@@ -18,6 +18,16 @@ typedef struct s_list
 	struct s_list	*next;
 }					t_list;
 
+typedef struct s_mem_alloc
+{
+	void		*content;
+	void		(*content_free)();
+	const char	*name;
+}				t_mem_alloc;
+
+void	free_index(t_list **mem_ref, const char *name);
+void	free_mem_alloc(void *mem_alloc);
+void	free_wrap(t_list **mem_ref, void *content);
 int		ft_atoi_base(const char *str, const char *base, size_t len_base);
 int		ft_atoi(const char *nptr);
 long	ft_atol(const char *nptr);
@@ -25,7 +35,7 @@ void	ft_bzero(void *s, size_t n);
 void	*ft_calloc(size_t nmemb, size_t size);
 char	*ft_convert_base(
 			const char *str, const char *base_from, const char *base_to);
-void	*ft_free_strs(char **strs);
+void	ft_free_strs(void *strs);
 int		ft_isalnum(int c);
 int		ft_isalpha(int c);
 int		ft_isascii(int c);
@@ -40,6 +50,7 @@ char	*ft_itoa(int n);
 void	ft_lstadd_back(t_list **alst, t_list *new);
 void	ft_lstadd_front(t_list **alst, t_list *new);
 void	ft_lstclear(t_list **lst, void (*del)(void*));
+void	ft_lstdel_front(t_list **alst, void (*del)(void*));
 void	ft_lstdelone(t_list *lst, void (*del)(void*));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstlast(t_list *lst);
@@ -79,5 +90,14 @@ char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
 int		ft_toupper(int c);
 int		ft_tolower(int c);
+void	malloc_clear(t_list **mem_ref);
+void	malloc_destroy(t_list **global_ref, t_list **local_ref);
+void	*malloc_get(t_list **mem_ref, const char *name);
+void	*malloc_index(
+			t_list **mem_ref,
+			const char *name, void (*mem_free)(void *), void *content);
+void	*malloc_wrap(
+			t_list **mem_ref,
+			const char *name, void (*mem_free)(void *), size_t size);
 
 #endif

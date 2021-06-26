@@ -1,22 +1,21 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstadd_front.c                                  :+:      :+:    :+:   */
+/*   malloc_destroy.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2021/04/15 21:16:54 by gamarcha          #+#    #+#             */
-/*   Updated: 2021/04/15 21:16:54 by gamarcha         ###   ########.fr       */
+/*   Created: 2021/06/25 23:35:55 by gamarcha          #+#    #+#             */
+/*   Updated: 2021/06/25 23:35:55 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	ft_lstadd_front(t_list **alst, t_list *new)
+void	malloc_destroy(t_list **global_ref, t_list **local_ref)
 {
-	t_list			*node;
-
-	node = *alst;
-	*alst = new;
-	(*alst)->next = node;
+	if (local_ref != NULL)
+		malloc_clear(local_ref);
+	malloc_clear(global_ref);
+	exit(1);
 }

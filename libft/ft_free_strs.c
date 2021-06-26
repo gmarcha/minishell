@@ -6,19 +6,18 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/06/02 14:40:46 by gamarcha          #+#    #+#             */
-/*   Updated: 2021/06/13 20:14:43 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/06/25 21:21:54 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void	*ft_free_strs(char **strs)
+void	ft_free_strs(void *strs)
 {
 	int				i;
 
 	i = 0;
-	while (strs[i])
-		free(strs[i++]);
+	while (((char **)strs)[i])
+		free(((char **)strs)[i++]);
 	free(strs);
-	return (0);
 }
