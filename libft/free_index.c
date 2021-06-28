@@ -16,9 +16,10 @@ void	free_index(t_list **mem_ref, const char *name)
 {
 	t_list			*mem_node;
 
-	if (*mem_ref == NULL)
+	if (*mem_ref == NULL || name == NULL)
 		return ;
-	if (ft_strcmp(((t_mem_alloc *)(*mem_ref)->content)->name, name) == 0)
+	if (((t_mem_alloc *)(*mem_ref)->content)->name != NULL
+		&& ft_strcmp(((t_mem_alloc *)(*mem_ref)->content)->name, name) == 0)
 	{
 		ft_lstdel_front(mem_ref, free_mem_alloc);
 		return ;
@@ -26,8 +27,9 @@ void	free_index(t_list **mem_ref, const char *name)
 	mem_node = *mem_ref;
 	while (mem_node != NULL && mem_node->next != NULL)
 	{
-		if (ft_strcmp(
-			((t_mem_alloc *)mem_node->next->content)->name, name) == 0)
+		if (((t_mem_alloc *)mem_node->next->content)->name != NULL
+			&& ft_strcmp(
+				((t_mem_alloc *)mem_node->next->content)->name, name) == 0)
 		{
 			ft_lstdel_front(&mem_node->next, free_mem_alloc);
 			return ;

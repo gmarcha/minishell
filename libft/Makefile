@@ -67,9 +67,9 @@ SRC			= 	free_index.c \
 				ft_substr.c \
 				ft_tolower.c \
 				ft_toupper.c \
+				get_index.c \
 				malloc_clear.c \
 				malloc_destroy.c \
-				malloc_get.c \
 				malloc_index.c \
 				malloc_wrap.c
 

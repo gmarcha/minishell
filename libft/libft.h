@@ -18,6 +18,13 @@ typedef struct s_list
 	struct s_list	*next;
 }					t_list;
 
+typedef struct s_btree
+{
+	void			*content;
+	struct s_btree	*left;
+	struct s_btree	*right;
+}				t_btree;
+
 typedef struct s_mem_alloc
 {
 	void		*content;
@@ -25,6 +32,14 @@ typedef struct s_mem_alloc
 	const char	*name;
 }				t_mem_alloc;
 
+void	btree_apply_infix(t_btree *node, void (*apply_f)(void *));
+void	btree_apply_prefix(t_btree *node, void (*apply_f)(void *));
+void	btree_apply_suffix(t_btree *node, void (*apply_f)(void *));
+t_btree	*btree_create_node(void *content);
+t_btree	*btree_insert_data(
+			t_btree **node, void *content, int (*cmp_f)(void *, void *));
+void	*btree_search_data(
+			t_btree *node, void *data_ref, int (*cmp_f)(void *, void *));
 void	free_index(t_list **mem_ref, const char *name);
 void	free_mem_alloc(void *mem_alloc);
 void	free_wrap(t_list **mem_ref, void *content);
@@ -88,11 +103,11 @@ char	*ft_strsjoin(const char **strs, const char *sep);
 size_t	ft_strslen(const char **strs);
 char	*ft_strtrim(char const *s1, char const *set);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
-int		ft_toupper(int c);
 int		ft_tolower(int c);
+int		ft_toupper(int c);
+void	*get_index(t_list **mem_ref, const char *name);
 void	malloc_clear(t_list **mem_ref);
 void	malloc_destroy(t_list **global_ref, t_list **local_ref);
-void	*malloc_get(t_list **mem_ref, const char *name);
 void	*malloc_index(
 			t_list **mem_ref,
 			const char *name, void (*mem_free)(void *), void *content);
