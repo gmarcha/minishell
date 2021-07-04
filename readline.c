@@ -20,6 +20,7 @@ int		main(void)
 {
 	char			*line;
 
+	using_history();
 	while (1)
 	{
 		line = readline("$>");
