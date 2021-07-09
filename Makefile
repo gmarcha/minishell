@@ -1,39 +1,62 @@
 NAME		=	minishell
-CC			=	gcc
-FLAGS		=	-Wall -Wextra -Werror
+CC			=	clang
+CFLAGS		=	-Wall -Wextra -Werror
+LFT			=	libft/libft.a
 INC			=	-I ./inc -I ./libft
-libft		=	-L ./libft -lft
+LIB			=	-L ./libft -lft -lreadline
 OBJ			=	$(patsubst src%, obj%, $(SRC:.c=.o))
-SRC			=	src/ft_free_strs.c \
-				src/ft_ischarset.c \
-				src/ft_strclen.c \
+SRC			=	src/close_cmd_fd.c \
+				src/destroy_process.c \
+				src/die.c \
+				src/execute_path.c \
+				src/execute.c \
+				src/launch_builtin.c \
+				src/launch.c \
+				src/line_read.c \
 				src/minishell.c \
-				src/shell_line.c \
-				src/shell_split.c
+				src/redirect.c \
+				src/reset_redirection.c \
+				src/wait_process.c
 
-all:		$(NAME)
+all:		$(LFT) obj $(NAME)
 
 $(NAME):	$(OBJ)
-			make -C libft
-			$(CC) $(FLAGS) -fsanitize=address -o $@ $^ -L ./libft -lft
+			$(CC) $(CFLAGS) -fsanitize=address -o $@ $^ $(LIB)
+
+test:		test_launch
+
+test_minishell:	all
+			./minishell
+
+test_launch:	$(OBJ) main_launch.o
+			$(CC) $(CFLAGS) -fsanitize=address -o test_launch $^ $(LIB)
+			@./test_launch
+			@rm test_launch main_launch.o
+
+%.o:		%.c
+			$(CC) $(CFLAGS) $(INC) -o $@ -c $<
+
+$(LFT):		
+			@echo " [ .. ] | Compiling libft.."
+			@make -sC libft
+			@echo " [ OK ] | Libft ready!"
+
+obj:
+			@mkdir -p obj
 
 obj/%.o:	src/%.c
-			@mkdir -p obj
-			$(CC) $(FLAGS) $(INC) -o $@ -c $<
-
-run:
-			@$(CC) $(FLAGS) $(INC) $(SRC)
-			@./a.out
-			@rm -rf a.out
+			$(CC) $(CFLAGS) $(INC) -o $@ -c $<
 
 clean:
-			make $@ -C libft
-			rm -rf $(OBJ)
+			@make $@ -sC libft
+			@rm -rf $(OBJ) obj
+			@echo "clean: object files removed."
 
 fclean:		clean
-			make $@ -C libft
-			rm -rf $(NAME)
+			@make $@ -sC libft
+			@rm -rf $(NAME)
+			@echo "fclean: binary files removed."
 
 re:			fclean all
 
-.PHONY:		all run clean fclean re
+.PHONY:		all clean fclean re
