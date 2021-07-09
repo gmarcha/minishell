@@ -25,6 +25,15 @@ typedef struct s_btree
 	struct s_btree	*right;
 }				t_btree;
 
+typedef struct s_rbtree
+{
+	void			*content;
+	int				color;
+	struct s_rbtree	*parent;
+	struct s_rbtree	*left;
+	struct s_rbtree	*right;
+}					t_rbtree;
+
 typedef struct s_mem_alloc
 {
 	void		*content;
@@ -35,6 +44,7 @@ typedef struct s_mem_alloc
 void	btree_apply_infix(t_btree *node, void (*apply_f)(void *));
 void	btree_apply_prefix(t_btree *node, void (*apply_f)(void *));
 void	btree_apply_suffix(t_btree *node, void (*apply_f)(void *));
+void	btree_clear(t_btree *node, void (*del)(void *));
 t_btree	*btree_create_node(void *content);
 t_btree	*btree_insert_data(
 			t_btree **node, void *content, int (*cmp_f)(void *, void *));
@@ -89,6 +99,7 @@ char	*ft_strcat(char *dest, const char *src);
 char	*ft_strchr(const char *s, int c);
 size_t	ft_strclen(const char *s, const char *charset);
 int		ft_strcmp(const char *s1, const char *s2);
+char	*ft_strconcat(char **str, char *new);
 char	*ft_strcpy(char *dest, const char *src);
 char	*ft_strdup(const char *s);
 char	*ft_strjoin(char const *s1, char const *s2);
