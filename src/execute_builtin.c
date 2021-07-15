@@ -17,8 +17,7 @@ static int	destroy_program(t_cmd *cmd, size_t index_cmd, t_var **env,
 {
 	int				status;
 
-	(void)exit_status;
-	status = mini_exit(cmd[index_cmd].args + 1, env);
+	status = mini_exit(cmd[index_cmd].args + 1, env, exit_status);
 	free_cmd(cmd, cmd[0].nb_cmd);
 	clear_list(env);
 	exit(status);
