@@ -12,15 +12,14 @@
 
 #include "minishell.h"
 
-static int	pipe_command(t_cmd *cmd, size_t nb_cmd, size_t index_cmd,
-	int p_fd[])
+static int	pipe_command(t_cmd *cmd, size_t index_cmd, int p_fd[])
 {
-	if (index_cmd < nb_cmd - 1)
+	if (index_cmd < cmd[0].nb_cmd - 1)
 	{
 		if (pipe(p_fd) == -1)
 		{
 			p_error(PROGRAM_NAME, "pipe()", errno);
-			close_cmd_fd(cmd, nb_cmd);
+			close_cmd_fd(cmd, cmd[0].nb_cmd);
 			return (-1);
 		}
 		cmd[index_cmd].fd_out = p_fd[1];
@@ -29,32 +28,32 @@ static int	pipe_command(t_cmd *cmd, size_t nb_cmd, size_t index_cmd,
 	return (0);
 }
 
-static int	init_command(t_cmd *cmd, size_t nb_cmd, size_t index_cmd,
+static int	init_command(t_cmd *cmd, size_t index_cmd, t_var **env,
 	int exit_status)
 {
 	int				p_fd[2];
 
-	if (pipe_command(cmd, nb_cmd, index_cmd, p_fd) == -1)
+	if (pipe_command(cmd, index_cmd, p_fd) == -1)
 		return (-1);
 	cmd[index_cmd].save_stdin = dup(STDIN_FILENO);
 	if (cmd[index_cmd].save_stdin == -1)
 	{
 		p_error(PROGRAM_NAME, "dup()", errno);
-		close_cmd_fd(cmd, nb_cmd);
+		close_cmd_fd(cmd, cmd[0].nb_cmd);
 		return (-1);
 	}
 	cmd[index_cmd].save_stdout = dup(STDOUT_FILENO);
 	if (cmd[index_cmd].save_stdout == -1)
 	{
 		p_error(PROGRAM_NAME, "dup()", errno);
-		close_cmd_fd(cmd, nb_cmd);
+		close_cmd_fd(cmd, cmd[0].nb_cmd);
 		return (-1);
 	}
-	return (redirect(cmd, nb_cmd, index_cmd, exit_status));
+	return (redirect(cmd, index_cmd, env, exit_status));
 }
 
-static int	init_process(t_cmd *cmd, size_t nb_cmd, size_t index_cmd,
-	char **envp)
+static int	init_process(t_cmd *cmd, size_t index_cmd, t_var **env,
+	int exit_status)
 {
 	pid_t			pid;
 
@@ -62,43 +61,42 @@ static int	init_process(t_cmd *cmd, size_t nb_cmd, size_t index_cmd,
 	if (pid == -1)
 	{
 		p_error(PROGRAM_NAME, "fork()", errno);
-		close_cmd_fd(cmd, nb_cmd);
+		close_cmd_fd(cmd, cmd[0].nb_cmd);
 		return (-1);
 	}
 	else if (pid == 0)
-		execute(cmd, nb_cmd, index_cmd, envp);
+		execute(cmd, index_cmd, env, exit_status);
 	else
 	{
-		if (reset_redirection(cmd, nb_cmd, index_cmd) == -1)
+		if (reset_redirection(cmd, index_cmd) == -1)
 			return (-1);
 		cmd[index_cmd].pid_process = pid;
 	}
 	return (0);
 }
 
-int	launch(t_cmd *cmd, size_t nb_cmd, char **envp, int exit_status)
+int	launch(t_cmd *cmd, t_var **env, int exit_status)
 {
 	size_t			index_cmd;
 	int				ret;
 
-	index_cmd = 0;
-	while (index_cmd < nb_cmd)
+	index_cmd = -1;
+	while (++index_cmd < cmd[0].nb_cmd)
 	{
-		ret = init_command(cmd, nb_cmd, index_cmd, exit_status);
+		ret = init_command(cmd, index_cmd, env, exit_status);
 		if (ret == -1)
 			return (1);
 		if (ret == -2)
 			continue ;
-		ret = launch_builtin(cmd, nb_cmd, index_cmd, envp);
+		ret = launch_builtin(cmd, index_cmd, env, exit_status);
 		if (ret == -1)
 			return (1);
 		else if (ret >= 0)
-			continue ;
-		ret = init_process(cmd, nb_cmd, index_cmd, envp);
+			return (ret);
+		ret = init_process(cmd, index_cmd, env, exit_status);
 		if (ret == -1)
 			return (1);
-		index_cmd++;
 	}
-	close_cmd_fd(cmd, nb_cmd);
-	return (wait_process(cmd, nb_cmd));
+	close_cmd_fd(cmd, cmd[0].nb_cmd);
+	return (wait_process(cmd, cmd[0].nb_cmd));
 }
