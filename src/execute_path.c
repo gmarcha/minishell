@@ -12,25 +12,24 @@
 
 #include "minishell.h"
 
-static void	destroy_path(t_cmd *cmd, size_t nb_cmd, char **envp,
-	char **env_path)
+static int	destroy_path(char **env_path)
 {
 	p_error(PROGRAM_NAME, "execute_path()", errno);
 	ft_free_strs(env_path);
-	destroy_process(cmd, nb_cmd, envp, 1);
+	return (-1);
 }
 
-static char	**retrieve_path(t_cmd *cmd, size_t nb_cmd, char **envp)
+static char	**retrieve_path(t_var *env)
 {
-	char	**env_path;
+	char	*path;
 
-	env_path = ft_split(getenv("PATH"), ':');
-	if (env_path == NULL)
+	path = get_var(env, "PATH");
+	if (*path == '\0')
 	{
-		p_error(PROGRAM_NAME, "path not found", 0);
-		destroy_process(cmd, nb_cmd, envp, 1);
+		p_error(PROGRAM_NAME, "path not found in environment", 0);
+		return (NULL);
 	}
-	return (env_path);
+	return (ft_split(path, ':'));
 }
 
 static int	ispath(char *dir_name, char *file_name)
@@ -41,22 +40,21 @@ static int	ispath(char *dir_name, char *file_name)
 	dir = opendir(dir_name);
 	if (dir == NULL)
 	{
-		if (errno == ENOENT)
+		if (errno == ENOENT || errno == EACCES || errno == ENOTDIR)
 			return (0);
 		return (-1);
 	}
-	while (1)
+	errno = 0;
+	ent = readdir(dir);
+	while (ent != NULL)
 	{
-		ent = readdir(dir);
-		if (ent == NULL)
-		{
-			if (errno != 0)
-				return (closedir(dir) * 0 - 1);
-			break ;
-		}
 		if (ft_strcmp(ent->d_name, file_name) == 0)
 			return (closedir(dir) * 0 + 1);
+		errno = 0;
+		ent = readdir(dir);
 	}
+	if (errno != 0)
+		return (closedir(dir) * 0 - 1);
 	return (closedir(dir) * 0);
 }
 
@@ -71,31 +69,30 @@ static char	*add_directory(char **env_path, char *name_exec)
 	return (*env_path);
 }
 
-void	execute_path(t_cmd *cmd, size_t nb_cmd, size_t index_cmd, char **envp)
+int	execute_path(t_cmd *cmd, size_t index_cmd, t_var *env, char **envp)
 {
 	char			**env_path;
 	int				ret;
 	size_t			i;
 
-	env_path = retrieve_path(cmd, nb_cmd, envp);
+	env_path = retrieve_path(env);
+	if (env_path == NULL)
+		return (-1);
 	i = -1;
 	while (env_path[++i] != NULL)
 	{
 		ret = ispath(env_path[i], cmd[index_cmd].args[0]);
 		if (ret == -1)
-			destroy_path(cmd, nb_cmd, envp, env_path);
+			return (destroy_path(env_path));
 		if (ret == 1)
 		{
 			env_path[i] = add_directory(env_path + i, cmd[index_cmd].args[0]);
 			if (env_path[i] == NULL)
-				destroy_path(cmd, nb_cmd, envp, env_path);
+				return (destroy_path(env_path));
 			if (execve(env_path[i], cmd[index_cmd].args, envp) == -1)
-			{
-				p_error(cmd[index_cmd].args[0], "command not found", 0);
-				ft_free_strs(env_path);
-				destroy_process(cmd, nb_cmd, envp, 127);
-			}
+				return (destroy_path(env_path));
 		}
 	}
 	ft_free_strs(env_path);
+	return (0);
 }
