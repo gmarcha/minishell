@@ -97,6 +97,8 @@ char	*expand_line(char *line_content, t_var *env, int exit_status)
 	t_node	*start;
 	t_node	*cur;
 
+	if (*line_content == '\0')
+		return (ft_strdup(line_content));
 	in_quote = FALSE;
 	start = NULL;
 	while (*line_content)
