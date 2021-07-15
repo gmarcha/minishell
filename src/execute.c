@@ -12,13 +12,27 @@
 
 #include "minishell.h"
 
-void	execute(t_cmd *cmd, size_t nb_cmd, size_t index_cmd, char **envp)
+void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 {
-	close_cmd_fd(cmd, nb_cmd);
-	execute_path(cmd, nb_cmd, index_cmd, envp);
+	char			**envp;
+	int				ret;
+
+	close_cmd_fd(cmd, cmd[0].nb_cmd);
+	ret = execute_builtin(cmd, index_cmd, env, exit_status);
+	if (ret >= 0)
+		destroy_process(cmd, cmd[0].nb_cmd, env, ret);
+	envp = export_to_envp(*env);
+	if (envp == NULL)
+		destroy_process(cmd, cmd[0].nb_cmd, env, ret);
+	if (execute_path(cmd, index_cmd, *env, envp) == -1)
+	{
+		ft_free_strs(envp);
+		destroy_process(cmd, cmd[0].nb_cmd, env, 1);
+	}
 	if (execve(cmd[index_cmd].args[0], cmd[index_cmd].args, envp) == -1)
 	{
 		p_error(cmd[index_cmd].args[0], "command not found", 0);
-		destroy_process(cmd, nb_cmd, envp, 127);
+		ft_free_strs(envp);
+		destroy_process(cmd, cmd[0].nb_cmd, env, 127);
 	}
 }
