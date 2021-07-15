@@ -29,6 +29,7 @@
 # define ENV_NAME_ERROR	"': not a valid identifier"
 # define CD_DIR_ERROR	": No such file or directory"
 # define CD_ARG_ERROR	"too many arguments"
+# define CD_HOME_ERROR	"HOME not set"
 
 typedef enum e_redirect
 {
@@ -59,6 +60,16 @@ typedef struct s_var
 	char			*value;
 	struct s_var	*next;
 }	t_var;
+
+typedef struct s_node	t_node;
+struct s_node
+{
+	char	c[2];
+	char	*s;
+	t_bool	free_s;
+	size_t	len;
+	t_node	*next;
+};
 
 void	close_cmd_fd(t_cmd *cmd, size_t nb_cmd);
 void	destroy_process(t_cmd *cmd, size_t nb_cmd, t_var **env,
@@ -110,5 +121,10 @@ int		mini_exit(char **args, t_var **var_list_ptr, int exit_status);
 int		mini_export(char **args, t_var **var_list_ptr);
 int		mini_pwd(char **args, t_var *var_list);
 int		mini_unset(char **args, t_var **var_list_ptr);
+
+t_node	*new_node(char c, char *s, t_bool free_s);
+void	*clear_nodes(t_node *start);
+void	append_node(t_node **start_ptr, t_node *node);
+char	*join_nodes(t_node *start);
 
 #endif

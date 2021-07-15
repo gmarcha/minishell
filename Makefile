@@ -37,6 +37,7 @@ SRC			=	src/builtin_cd.c \
 				src/parse_add_arg_to_args.c \
 				src/parse_command.c \
 				src/parse_create_command.c \
+				src/parse_expand_line_utils.c \
 				src/parse_expand_line.c \
 				src/parse_expand_redirect_op.c \
 				src/parse_handle_unclosed_quotes.c \

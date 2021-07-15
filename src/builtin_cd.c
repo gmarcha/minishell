@@ -6,7 +6,7 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/08 18:08:12 by qdam              #+#    #+#             */
-/*   Updated: 2021/07/14 22:54:13 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/07/15 17:32:27 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ int	mini_cd(char **args, t_var *var_list)
 	if (!(*args))
 	{
 		home_args = (char *[]){get_var(var_list, "HOME"), NULL};
+		if (!ft_strcmp(EMPTY_STR, home_args[0]))
+			return (show_error_cd(NULL, CD_HOME_ERROR));
 		return (mini_cd(home_args, var_list));
 	}
 	if (args[1])

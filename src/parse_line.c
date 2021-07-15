@@ -43,6 +43,7 @@ t_cmd	*parse_line(char **line, t_var *env, int *exit_status)
 	if (line_content == NULL)
 		return (NULL);
 	line_expand = expand_line(line_content, env, *exit_status);
+	free(line_content);
 	if (line_expand == NULL)
 		return (NULL);
 	if (is_line_not_empty(line_expand, exit_status) == -1)
