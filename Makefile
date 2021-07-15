@@ -27,6 +27,7 @@ SRC			=	src/builtin_cd.c \
 				src/free_cmd.c \
 				src/free_sstrs.c \
 				src/launch_builtin.c \
+				src/launch_heredoc.c \
 				src/launch_redirect.c \
 				src/launch_reset_redirection.c \
 				src/launch_wait_process.c \
