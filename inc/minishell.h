@@ -72,6 +72,7 @@ void	free_cmd(t_cmd *cmd, size_t nb_cmd);
 void	free_sstrs(char ***command_redirect, size_t nb_cmd);
 int		launch_builtin(t_cmd *cmd, size_t index_cmd, t_var **env,
 			int exit_status);
+int		heredoc(t_cmd *cmd, size_t index_cmd, t_var *env, int exit_status);
 int		redirect(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status);
 int		reset_redirection(t_cmd *cmd, size_t index_cmd);
 int		wait_process(t_cmd *cmd, size_t nb_cmd);
