@@ -12,26 +12,21 @@
 
 #include "minishell.h"
 
-int	launch_builtin(t_cmd *cmd, size_t nb_cmd, size_t index_cmd, char **envp)
+int	launch_builtin(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 {
-	char			**builtin;
-	size_t			i;
+	int				ret;
 
-	(void)envp;
-	builtin = (char *[])
-	{"echo", "cd", "pwd", "export", "unset", "env", "exit", 0};
-	i = 0;
-	while (builtin[i] != NULL)
+	ret = -2;
+	if (cmd[0].nb_cmd == 1)
+		ret = execute_builtin(cmd, index_cmd, env, exit_status);
+	if (ret >= 0)
 	{
-		if (ft_strcmp(cmd[index_cmd].args[0], builtin[i]) == 0)
+		if (reset_redirection(cmd, index_cmd) == -1)
 		{
-			// close some pipes
-			cmd[index_cmd].exit_status = 0; // FUNCTION POINTER TO BUILTIN
-			if (reset_redirection(cmd, nb_cmd, index_cmd) == -1)
-				return (-1);
-			return (cmd[index_cmd].exit_status);
+			close_cmd_fd(cmd, cmd[0].nb_cmd);
+			return (-1);
 		}
-		i++;
+		close_cmd_fd(cmd, cmd[0].nb_cmd);
 	}
-	return (-2);
+	return (ret);
 }
