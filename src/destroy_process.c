@@ -12,11 +12,9 @@
 
 #include "minishell.h"
 
-void	destroy_process(t_cmd *cmd, size_t nb_cmd, char **envp, int exit_status)
+void	destroy_process(t_cmd *cmd, size_t nb_cmd, t_var **env, int exit_status)
 {
-	(void)envp;
-	// ft_free_strs(envp);
-	(void)cmd; (void)nb_cmd;
-	// free_cmd(cmd, nb_cmd);
+	free_cmd(cmd, nb_cmd);
+	clear_list(env);
 	exit(exit_status);
 }
