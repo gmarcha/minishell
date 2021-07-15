@@ -33,6 +33,7 @@ static int	write_env_variable(char *line, t_var *env, int heredoc_fd[],
 		return (-1);
 	}
 	replace_str = get_var(env, var_env);
+	free(var_env);
 	ft_putstr_fd(replace_str, heredoc_fd[1]);
 	return (size);
 }
