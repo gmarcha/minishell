@@ -103,7 +103,7 @@ char	**export_to_envp(t_var *globals);
 int		mini_cd(char **args, t_var *var_list);
 int		mini_echo(char **args);
 int		mini_env(char **args, t_var *var_list);
-int		mini_exit(char **args, t_var **var_list_ptr);
+int		mini_exit(char **args, t_var **var_list_ptr, int exit_status);
 int		mini_export(char **args, t_var **var_list_ptr);
 int		mini_pwd(char **args, t_var *var_list);
 int		mini_unset(char **args, t_var **var_list_ptr);
