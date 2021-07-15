@@ -86,6 +86,7 @@ static t_node	*wrap_in_quote(t_node *node)
 			free(node->s);
 		node->s = wrapped;
 		node->free_s = TRUE;
+		node->len += 2;
 	}
 	return (node);
 }
