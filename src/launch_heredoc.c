@@ -12,7 +12,14 @@
 
 #include "minishell.h"
 
-static int	write_env_variable(char *line, t_var *env, int heredoc_fd[], size_t i)
+static int	is_env_variable(char *line, size_t i)
+{
+	return (line[i] == '$'
+		&& (ft_ischarset(line[i + 1], "?_") || ft_isalpha(line[i + 1]) == 1));
+}
+
+static int	write_env_variable(char *line, t_var *env, int heredoc_fd[],
+	size_t i)
 {
 	char			*replace_str;
 	char			*var_env;
@@ -30,7 +37,8 @@ static int	write_env_variable(char *line, t_var *env, int heredoc_fd[], size_t i
 	return (size);
 }
 
-static char	*write_line(char *line, t_var *env, int exit_status, int heredoc_fd[])
+static char	*write_line(char *line, t_var *env, int exit_status,
+	int heredoc_fd[])
 {
 	int				size;
 	size_t			i;
@@ -38,7 +46,7 @@ static char	*write_line(char *line, t_var *env, int exit_status, int heredoc_fd[
 	i = 0;
 	while (line[i] != '\0')
 	{
-		if (line[i] == '$' && (ft_ischarset(line[i + 1], "?_") || ft_isalpha(line[i + 1]) == 1))
+		if (is_env_variable(line, i) == 1)
 		{
 			if (line[++i] == '?')
 			{
