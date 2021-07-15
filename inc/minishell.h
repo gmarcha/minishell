@@ -21,7 +21,7 @@
 # define CYAN			"\033[36m"
 
 # define PROGRAM_NAME	"minishell"
-# define PROMPT			MAGENTA"§¬ "CYAN"minishell-42 "YELLOW"Ÿ "RESET
+# define PROMPT			"\033[35m§¬ \033[36mminishell-42 \033[33mŸ \033[0m"
 
 # define EMPTY_STR		""
 
@@ -60,16 +60,18 @@ typedef struct s_var
 	struct s_var	*next;
 }	t_var;
 
-
 void	close_cmd_fd(t_cmd *cmd, size_t nb_cmd);
-void	destroy_process(t_cmd *cmd, size_t nb_cmd, t_var **env, int exit_status);
+void	destroy_process(t_cmd *cmd, size_t nb_cmd, t_var **env,
+			int exit_status);
 void	p_error(char *name, char *errmsg, int errnum);
-int		execute_builtin(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status);
+int		execute_builtin(t_cmd *cmd, size_t index_cmd, t_var **env,
+			int exit_status);
 int		execute_path(t_cmd *cmd, size_t index_cmd, t_var *env, char **envp);
 void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status);
 void	free_cmd(t_cmd *cmd, size_t nb_cmd);
 void	free_sstrs(char ***command_redirect, size_t nb_cmd);
-int		launch_builtin(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status);
+int		launch_builtin(t_cmd *cmd, size_t index_cmd, t_var **env,
+			int exit_status);
 int		redirect(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status);
 int		reset_redirection(t_cmd *cmd, size_t index_cmd);
 int		wait_process(t_cmd *cmd, size_t nb_cmd);
