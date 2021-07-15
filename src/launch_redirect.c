@@ -12,32 +12,6 @@
 
 #include "minishell.h"
 
-static int	heredoc(t_cmd *cmd, size_t index_cmd, t_var *env, int exit_status)
-// TODO: expansion on write();
-{
-	int				heredoc_fd[2];
-	char			*line;
-
-	(void)env;
-	(void)exit_status;
-	if (pipe(heredoc_fd) == -1)
-		return (-1);
-	line = NULL;
-	line = line_read(line, "> ");
-	while (line != NULL && ft_strcmp(line, cmd[index_cmd].name_in) != 0)
-	{
-		write(heredoc_fd[1], line, ft_strlen(line));
-		write(heredoc_fd[1], "\n", 1);
-		line = line_read(line, "> ");
-	}
-	if (line != NULL)
-		free(line);
-	else
-		write(1, "\n", 1);
-	close(heredoc_fd[1]);
-	return (heredoc_fd[0]);
-}
-
 static int	redirect_input(t_cmd *cmd, size_t index_cmd, t_var **env,
 	int exit_status)
 {
