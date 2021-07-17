@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-static t_cmd	*init_command(char **command_list, size_t nb_cmd)
+static t_cmd	*init_command(char **command_list, size_t nb_cmd, t_var *env)
 {
 	t_cmd			*cmd;
 	char			***command_redirect;
@@ -27,30 +27,25 @@ static t_cmd	*init_command(char **command_list, size_t nb_cmd)
 	i = 0;
 	while (i < nb_cmd)
 		cmd[i++].nb_cmd = nb_cmd;
-	if (parse_command(cmd, nb_cmd, command_redirect) == -1)
+	if (parse_command(cmd, nb_cmd, command_redirect, env) == -1)
 		return (NULL);
 	return (cmd);
 }
 
-t_cmd	*parse_line(char **line, t_var *env, int *exit_status)
+t_cmd	*parse_line(char **line, t_var *env)
 {
 	char			*line_content;
-	char			*line_expand;
 	char			**command_list;
 	size_t			nb_cmd;
 
 	line_content = handle_unclosed_quotes(line);
 	if (line_content == NULL)
 		return (NULL);
-	line_expand = expand_line(line_content, env, *exit_status);
-	free(line_content);
-	if (line_expand == NULL)
+	if (is_line_not_empty(line_content) == -1)
 		return (NULL);
-	if (is_line_not_empty(line_expand, exit_status) == -1)
-		return (NULL);
-	command_list = split_line(line_expand);
+	command_list = split_line(line_content);
 	if (command_list == NULL)
 		return (NULL);
 	nb_cmd = ft_strslen((const char **)command_list);
-	return (init_command(command_list, nb_cmd));
+	return (init_command(command_list, nb_cmd, env));
 }
