@@ -19,38 +19,8 @@ static int	destroy_command(t_cmd *cmd, size_t nb_cmd, char ***command_redirect)
 	return (-1);
 }
 
-static char	*expand_file(t_cmd *cmd, size_t index_args,
-	char ***command_redirect, t_var *env)
-{
-	char			*expanse;
-	char			*tmp;
-
-	expanse = expand_line(command_redirect[cmd[0].index_cmd][index_args],
-		env, g_exit_status);
-	if (expanse == NULL)
-		return (NULL);
-	if (*expanse == '\0' || ft_strchr(expanse, ' ') != NULL)
-	{
-		tmp = ft_strjoin(command_redirect[cmd[0].index_cmd][index_args],
-			": ambiguous redirect");
-		if (tmp == NULL)
-		{
-			free(expanse);
-			return (NULL);
-		}
-		p_error(PROGRAM_NAME, tmp, 0);
-		g_exit_status = 1;
-		free(tmp);
-		free(expanse);
-		return (NULL);
-	}
-	free(command_redirect[cmd[0].index_cmd][index_args]);
-	command_redirect[cmd[0].index_cmd][index_args] = expanse;
-	return (command_redirect[cmd[0].index_cmd][index_args]);
-}
-
 static int	parse_infile(t_cmd *cmd, size_t *index_args,
-	char ***command_redirect, t_var *env)
+	char ***command_redirect)
 {
 	if (command_redirect[cmd[0].index_cmd][*index_args][1] == '<')
 		cmd[cmd[0].index_cmd].redirect_in = DOUBLE_REDIRECTION;
@@ -67,10 +37,6 @@ static int	parse_infile(t_cmd *cmd, size_t *index_args,
 		g_exit_status = 2;
 		return (-1);
 	}
-	if (expand_file(cmd, *index_args, command_redirect, env) == NULL)
-		return (-1);
-	if (remove_quotes(command_redirect, cmd[0].index_cmd, *index_args) == -1)
-		return (-1);
 	if (cmd[cmd[0].index_cmd].name_in != NULL)
 		free(cmd[cmd[0].index_cmd].name_in);
 	cmd[cmd[0].index_cmd].name_in = ft_strdup(
@@ -81,7 +47,7 @@ static int	parse_infile(t_cmd *cmd, size_t *index_args,
 }
 
 static int	parse_outfile(t_cmd *cmd, size_t *index_args,
-	char ***command_redirect, t_var *env)
+	char ***command_redirect)
 {
 	if (command_redirect[cmd[0].index_cmd][*index_args][1] == '>')
 		cmd[cmd[0].index_cmd].redirect_out = DOUBLE_REDIRECTION;
@@ -98,10 +64,6 @@ static int	parse_outfile(t_cmd *cmd, size_t *index_args,
 		g_exit_status = 2;
 		return (-1);
 	}
-	if (expand_file(cmd, *index_args, command_redirect, env) == NULL)
-		return (-1);
-	if (remove_quotes(command_redirect, cmd[0].index_cmd, *index_args) == -1)
-		return (-1);
 	if (cmd[cmd[0].index_cmd].name_out != NULL)
 		free(cmd[cmd[0].index_cmd].name_out);
 	cmd[cmd[0].index_cmd].name_out = ft_strdup(
@@ -130,12 +92,12 @@ static int	parse_arg(t_cmd *cmd, size_t *index_args,
 {
 	if (command_redirect[cmd[0].index_cmd][*index_args][0] == '<')
 	{
-		if (parse_infile(cmd, index_args, command_redirect, env) == -1)
+		if (parse_infile(cmd, index_args, command_redirect) == -1)
 			return (-1);
 	}
 	else if (command_redirect[cmd[0].index_cmd][*index_args][0] == '>')
 	{
-		if (parse_outfile(cmd, index_args, command_redirect, env) == -1)
+		if (parse_outfile(cmd, index_args, command_redirect) == -1)
 			return (-1);
 	}
 	else
@@ -144,7 +106,7 @@ static int	parse_arg(t_cmd *cmd, size_t *index_args,
 			return (-1);
 		if (*command_redirect[cmd[0].index_cmd][*index_args] == '\0')
 			return (0);
-		if (remove_quotes(command_redirect, cmd[0].index_cmd, *index_args) == -1)
+		if (remove_quotes(command_redirect[cmd[0].index_cmd] + *index_args) == -1)
 			return (-1);
 		cmd[cmd[0].index_cmd].args = add_arg_to_args(
 				cmd[cmd[0].index_cmd].args, command_redirect[cmd[0].index_cmd][*index_args]);

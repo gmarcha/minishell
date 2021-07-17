@@ -100,8 +100,7 @@ char	**expand_redirect_op(char **command_list, size_t nb_cmd);
 char	*handle_unclosed_quotes(char **line);
 int		is_line_not_empty(char *line_expand);
 t_cmd	*parse_line(char **line, t_var *env);
-int		remove_quotes(char ***command_redirect,
-			size_t index_cmd, size_t index_args);
+int		remove_quotes(char **command);
 void	skip_quotes(char *command, size_t *i);
 char	***split_command(char **command_list, size_t nb_cmd);
 char	**split_line(char *line_expand);
