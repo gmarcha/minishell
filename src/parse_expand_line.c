@@ -69,28 +69,6 @@ static t_node	*expand_char(char **line_ptr)
 	return (node);
 }
 
-static t_node	*wrap_in_quote(t_node *node)
-{
-	char	*wrapped;
-
-	if (node && node->s)
-	{
-		wrapped = malloc(sizeof(char) * (node->len + 3));
-		if (!wrapped)
-			return (node);
-		wrapped[0] = '\'';
-		wrapped[node->len + 1] = '\'';
-		wrapped[node->len + 2] = 0;
-		ft_memcpy(wrapped + 1, node->s, node->len);
-		if (node->free_s)
-			free(node->s);
-		node->s = wrapped;
-		node->free_s = TRUE;
-		node->len += 2;
-	}
-	return (node);
-}
-
 char	*expand_line(char *line_content, t_var *env, int exit_status)
 {
 	t_bool	in_quote;
@@ -106,7 +84,7 @@ char	*expand_line(char *line_content, t_var *env, int exit_status)
 		if (!in_quote && *line_content == '\'')
 			cur = expand_single_quote(&line_content);
 		else if (*line_content == '$')
-			cur = wrap_in_quote(expand_dollar(&line_content, env, exit_status));
+			cur = expand_dollar(&line_content, env, exit_status);
 		else
 		{
 			if (*line_content == '"')
