@@ -31,6 +31,8 @@
 # define CD_ARG_ERROR	"too many arguments"
 # define CD_HOME_ERROR	"HOME not set"
 
+extern volatile int	g_exit_status;
+
 typedef enum e_redirect
 {
 	NO_REDIRECTION,
@@ -41,6 +43,7 @@ typedef enum e_redirect
 typedef struct s_cmd
 {
 	size_t			nb_cmd;
+	size_t			index_cmd;
 	char			**args;
 	int				fd_in;
 	int				fd_out;
@@ -59,17 +62,16 @@ typedef struct s_var
 	char			*name;
 	char			*value;
 	struct s_var	*next;
-}	t_var;
+}					t_var;
 
-typedef struct s_node	t_node;
-struct s_node
+typedef struct s_node
 {
-	char	c[2];
-	char	*s;
-	t_bool	free_s;
-	size_t	len;
-	t_node	*next;
-};
+	char			c[2];
+	char			*s;
+	t_bool			free_s;
+	size_t			len;
+	struct s_node	*next;
+}					t_node;
 
 void	close_cmd_fd(t_cmd *cmd, size_t nb_cmd);
 void	destroy_process(t_cmd *cmd, size_t nb_cmd, t_var **env,
@@ -90,13 +92,14 @@ int		wait_process(t_cmd *cmd, size_t nb_cmd);
 int		launch(t_cmd *cmd, t_var **env, int exit_status);
 char	*line_read(char *line, char *prompt);
 char	**add_arg_to_args(char **input_args, char *arg);
-int		parse_command(t_cmd *cmd, size_t nb_cmd, char ***command_redirect);
+int		parse_command(t_cmd *cmd, size_t nb_cmd, char ***command_redirect,
+			t_var *env);
 t_cmd	*create_command(size_t nb_cmd, char ***command_redirect);
 char	*expand_line(char *line_content, t_var *env, int exit_status);
 char	**expand_redirect_op(char **command_list, size_t nb_cmd);
 char	*handle_unclosed_quotes(char **line);
-int		is_line_not_empty(char *line_expand, int *exit_status);
-t_cmd	*parse_line(char **line, t_var *env, int *exit_status);
+int		is_line_not_empty(char *line_expand);
+t_cmd	*parse_line(char **line, t_var *env);
 int		remove_quotes(char ***command_redirect,
 			size_t index_cmd, size_t index_args);
 void	skip_quotes(char *command, size_t *i);
