@@ -26,6 +26,8 @@ static int	destroy_program(t_cmd *cmd, size_t index_cmd, t_var **env,
 
 int	execute_builtin(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 {
+	if (cmd[index_cmd].args == NULL)
+		return (-2);
 	if (ft_strcmp(cmd[index_cmd].args[0], "cd") == 0)
 		return (mini_cd(cmd[index_cmd].args + 1, *env));
 	if (ft_strcmp(cmd[index_cmd].args[0], "echo") == 0)
