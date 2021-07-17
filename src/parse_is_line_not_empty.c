@@ -53,7 +53,7 @@ static int	is_line_valid(char *line_expand, size_t *status, size_t *pos)
 	return (0);
 }
 
-int	is_line_not_empty(char *line_expand, int *exit_status)
+int	is_line_not_empty(char *line_expand)
 {
 	size_t			pos;
 	size_t			status;
@@ -62,7 +62,6 @@ int	is_line_not_empty(char *line_expand, int *exit_status)
 	if (pos == 0 || string_is_empty(line_expand) == 1)
 	{
 		free(line_expand);
-		*exit_status = 0;
 		return (-1);
 	}
 	status = 0;
@@ -70,13 +69,13 @@ int	is_line_not_empty(char *line_expand, int *exit_status)
 	{
 		if (is_line_valid(line_expand, &status, &pos) == -1)
 		{
-			*exit_status = 2;
+			g_exit_status = 2;
 			return (-1);
 		}
 	}
 	if (status == 0)
 	{
-		*exit_status = 2;
+		g_exit_status = 2;
 		return (handling_error_pipeline(line_expand));
 	}
 	return (0);
