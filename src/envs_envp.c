@@ -12,6 +12,22 @@
 
 #include "minishell.h"
 
+t_bool	check_var_exist(t_var *list, char *name)
+{
+	t_var	*cur;
+
+	if (!name)
+		return (FALSE);
+	cur = list;
+	while (cur)
+	{
+		if (!ft_strcmp(cur->name, name))
+			return (TRUE);
+		cur = cur->next;
+	}
+	return (FALSE);
+}
+
 static t_bool	alloc_single_ev(char **envp, int i, t_var *var)
 {
 	size_t	len_name;

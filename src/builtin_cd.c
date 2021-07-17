@@ -6,7 +6,7 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/08 18:08:12 by qdam              #+#    #+#             */
-/*   Updated: 2021/07/15 17:32:27 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/07/17 15:48:21 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,13 @@ int	mini_cd(char **args, t_var *var_list)
 	char	*cwd;
 	char	**home_args;
 
-	if (!args)
+	if (!args || (args[0] && args[0][0] == 0))
 		return (0);
 	if (!(*args))
 	{
-		home_args = (char *[]){get_var(var_list, "HOME"), NULL};
-		if (!ft_strcmp(EMPTY_STR, home_args[0]))
+		if (!check_var_exist(var_list, "HOME"))
 			return (show_error_cd(NULL, CD_HOME_ERROR));
+		home_args = (char *[]){get_var(var_list, "HOME"), NULL};
 		return (mini_cd(home_args, var_list));
 	}
 	if (args[1])

@@ -115,6 +115,7 @@ void	del_var(t_var **list, char *name);
 char	*get_var(t_var *list, char *name);
 t_bool	set_var(t_var *list, char *name, char *new_value);
 char	**export_to_envp(t_var *globals);
+t_bool	check_var_exist(t_var *list, char *name);
 
 int		mini_cd(char **args, t_var *var_list);
 int		mini_echo(char **args);

@@ -31,7 +31,7 @@ t_bool	add_var(t_var **list, char *name, char *value)
 
 	if (!list)
 		return (FALSE);
-	if (ft_strcmp(EMPTY_STR, get_var(*list, name)))
+	if (check_var_exist(*list, name))
 		return (set_var(*list, name, value));
 	trim_spaces(&value);
 	new_var = make_var(name, value);
