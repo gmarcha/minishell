@@ -33,26 +33,24 @@
 
 extern volatile int	g_exit_status;
 
-typedef enum e_redirect
+typedef enum e_redirect_op
 {
 	NO_REDIRECTION,
 	SIMPLE_REDIRECTION,
 	DOUBLE_REDIRECTION
-}				t_redirect;
+}					t_redirect_op;
 
 typedef struct s_cmd
 {
 	size_t			nb_cmd;
 	size_t			index_cmd;
 	char			**args;
+	char			**redirection;
+	char			**redirect_op;
 	int				fd_in;
 	int				fd_out;
 	int				save_stdin;
 	int				save_stdout;
-	t_redirect		redirect_in;
-	t_redirect		redirect_out;
-	char			*name_in;
-	char			*name_out;
 	pid_t			pid_process;
 	int				exit_status;
 }					t_cmd;
@@ -85,8 +83,8 @@ void	free_cmd(t_cmd *cmd, size_t nb_cmd);
 void	free_sstrs(char ***command_redirect, size_t nb_cmd);
 int		launch_builtin(t_cmd *cmd, size_t index_cmd, t_var **env,
 			int exit_status);
-int		heredoc(t_cmd *cmd, size_t index_cmd, t_var *env, int exit_status);
-int		redirect(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status);
+int		heredoc(char *delimiter, t_var *env, int exit_status);
+int		redirect(t_cmd *cmd, size_t index_cmd, t_var **env);
 int		reset_redirection(t_cmd *cmd, size_t index_cmd);
 int		wait_process(t_cmd *cmd, size_t nb_cmd);
 int		launch(t_cmd *cmd, t_var **env, int exit_status);
@@ -96,6 +94,7 @@ int		parse_command(t_cmd *cmd, size_t nb_cmd, char ***command_redirect,
 			t_var *env);
 t_cmd	*create_command(size_t nb_cmd, char ***command_redirect);
 char	*expand_line(char *line_content, t_var *env, int exit_status);
+char	*trim_spaces(char *str);
 char	**expand_redirect_op(char **command_list, size_t nb_cmd);
 char	*handle_unclosed_quotes(char **line);
 int		is_line_not_empty(char *line_expand);

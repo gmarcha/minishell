@@ -6,11 +6,31 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/15 17:41:28 by gamarcha          #+#    #+#             */
-/*   Updated: 2021/07/15 17:45:33 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/07/19 16:55:43 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+char	*trim_spaces(char *str)
+{
+	size_t	i;
+	char	*trimmed;
+
+	if (!str)
+		return (NULL);
+	while (*str == ' ')
+		str++;
+	i = ft_strlen(str);
+	if (i == 0)
+		return (ft_strdup(""));
+	while (str[i - 1] == ' ')
+		i--;
+	trimmed = malloc(sizeof(char) * (i + 1));
+	if (trimmed)
+		ft_strlcpy(trimmed, str, i + 1);
+	return (trimmed);
+}
 
 t_node	*new_node(char c, char *s, t_bool free_s)
 {

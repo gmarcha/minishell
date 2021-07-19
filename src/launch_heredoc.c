@@ -68,7 +68,7 @@ static char	*write_line(char *line, t_var *env, int exit_status,
 	return (line);
 }
 
-int	heredoc(t_cmd *cmd, size_t index_cmd, t_var *env, int exit_status)
+int	heredoc(char *delimiter, t_var *env, int exit_status)
 {
 	int				heredoc_fd[2];
 	char			*line;
@@ -77,7 +77,7 @@ int	heredoc(t_cmd *cmd, size_t index_cmd, t_var *env, int exit_status)
 		return (-1);
 	line = NULL;
 	line = line_read(line, "> ");
-	while (line != NULL && ft_strcmp(line, cmd[index_cmd].name_in) != 0)
+	while (line != NULL && ft_strcmp(line, delimiter) != 0)
 	{
 		if (write_line(line, env, exit_status, heredoc_fd) == NULL)
 			return (-1);

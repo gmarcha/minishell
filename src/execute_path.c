@@ -25,10 +25,7 @@ static char	**retrieve_path(t_var *env)
 
 	path = get_var(env, "PATH");
 	if (*path == '\0')
-	{
-		p_error(PROGRAM_NAME, "path not found in environment", 0);
 		return (NULL);
-	}
 	return (ft_split(path, ':'));
 }
 
@@ -77,7 +74,7 @@ int	execute_path(t_cmd *cmd, size_t index_cmd, t_var *env, char **envp)
 
 	env_path = retrieve_path(env);
 	if (env_path == NULL)
-		return (-1);
+		return (0);
 	i = -1;
 	while (env_path[++i] != NULL)
 	{

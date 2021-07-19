@@ -89,7 +89,7 @@ int	main(int ac, char *av[], char **envp)
 			clear_list(&env);
 			return (EXIT_FAILURE);
 		}
-		if (add_var(&env, "OLD_PWD", pwd) == FALSE)
+		if (add_var(&env, "OLDPWD", pwd) == FALSE)
 		{
 			free(pwd);
 			clear_list(&env);

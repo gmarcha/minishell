@@ -34,7 +34,8 @@ static t_node	*expand_single_quote(char **line_ptr)
 	return (node);
 }
 
-static t_node	*expand_dollar(char **line_ptr, t_var *var_list, int exit_code)
+static t_node	*expand_dollar(char **line_ptr, t_var *var_list, int exit_code,
+	t_bool in_quote)
 {
 	char	var_name[1024];
 	size_t	i;
@@ -57,7 +58,9 @@ static t_node	*expand_dollar(char **line_ptr, t_var *var_list, int exit_code)
 		return (new_node('$', NULL, FALSE));
 	node = new_node(0, get_var(var_list, var_name), FALSE);
 	(*line_ptr) += i;
-	return (node);
+	if (in_quote)
+		return (new_node(0, get_var(var_list, var_name), FALSE));
+	return (new_node(0, trim_spaces(get_var(var_list, var_name)), TRUE));
 }
 
 static t_node	*expand_char(char **line_ptr)
@@ -76,7 +79,7 @@ char	*expand_line(char *line_content, t_var *env, int exit_status)
 	t_node	*cur;
 
 	if (*line_content == '\0')
-		return (ft_strdup(line_content));
+		return (ft_strdup(""));
 	in_quote = FALSE;
 	start = NULL;
 	while (*line_content)
@@ -84,7 +87,7 @@ char	*expand_line(char *line_content, t_var *env, int exit_status)
 		if (!in_quote && *line_content == '\'')
 			cur = expand_single_quote(&line_content);
 		else if (*line_content == '$')
-			cur = expand_dollar(&line_content, env, exit_status);
+			cur = expand_dollar(&line_content, env, exit_status, in_quote);
 		else
 		{
 			if (*line_content == '"')

@@ -28,8 +28,7 @@ static int	pipe_command(t_cmd *cmd, size_t index_cmd, int p_fd[])
 	return (0);
 }
 
-static int	init_command(t_cmd *cmd, size_t index_cmd, t_var **env,
-	int exit_status)
+static int	init_command(t_cmd *cmd, size_t index_cmd, t_var **env)
 {
 	int				p_fd[2];
 
@@ -49,7 +48,7 @@ static int	init_command(t_cmd *cmd, size_t index_cmd, t_var **env,
 		close_cmd_fd(cmd, cmd[0].nb_cmd);
 		return (-1);
 	}
-	return (redirect(cmd, index_cmd, env, exit_status));
+	return (redirect(cmd, index_cmd, env));
 }
 
 static int	init_process(t_cmd *cmd, size_t index_cmd, t_var **env,
@@ -83,10 +82,8 @@ int	launch(t_cmd *cmd, t_var **env, int exit_status)
 	index_cmd = -1;
 	while (++index_cmd < cmd[0].nb_cmd)
 	{
-		ret = init_command(cmd, index_cmd, env, exit_status);
+		ret = init_command(cmd, index_cmd, env);
 		if (ret == -1)
-			return (1);
-		if (ret == -2)
 			continue ;
 		ret = launch_builtin(cmd, index_cmd, env, exit_status);
 		if (ret == -1)

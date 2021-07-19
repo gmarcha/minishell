@@ -26,6 +26,7 @@ t_bool	check_var_exist(t_var *list, char *name)
 		cur = cur->next;
 	}
 	return (FALSE);
+
 }
 
 static t_bool	alloc_single_ev(char **envp, int i, t_var *var)

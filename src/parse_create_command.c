@@ -27,14 +27,12 @@ t_cmd	*create_command(size_t nb_cmd, char ***command_redirect)
 	while (++index_cmd < nb_cmd)
 	{
 		cmd[index_cmd].args = NULL;
+		cmd[index_cmd].redirection = NULL;
+		cmd[index_cmd].redirect_op = NULL;
 		cmd[index_cmd].fd_in = STDIN_FILENO;
 		cmd[index_cmd].fd_out = STDOUT_FILENO;
 		cmd[index_cmd].save_stdin = STDIN_FILENO;
 		cmd[index_cmd].save_stdout = STDOUT_FILENO;
-		cmd[index_cmd].redirect_in = NO_REDIRECTION;
-		cmd[index_cmd].redirect_out = NO_REDIRECTION;
-		cmd[index_cmd].name_in = NULL;
-		cmd[index_cmd].name_out = NULL;
 		cmd[index_cmd].pid_process = 0;
 		cmd[index_cmd].exit_status = 0;
 	}

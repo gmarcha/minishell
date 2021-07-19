@@ -6,7 +6,7 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/08 18:08:12 by qdam              #+#    #+#             */
-/*   Updated: 2021/07/17 15:48:21 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/07/19 16:57:15 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ int	mini_cd(char **args, t_var *var_list)
 	if (chdir(args[0]))
 		return (show_error_cd(args[0], CD_DIR_ERROR));
 	cwd = getcwd(NULL, 0);
-	set_var(var_list, "OLDPWD", get_var(var_list, "PWD"));
-	set_var(var_list, "PWD", cwd);
+	add_var(&var_list, "OLDPWD", get_var(var_list, "PWD"));
+	add_var(&var_list, "PWD", cwd);
 	free(cwd);
 	return (0);
 }

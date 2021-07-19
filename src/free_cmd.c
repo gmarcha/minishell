@@ -21,10 +21,10 @@ void	free_cmd(t_cmd *cmd, size_t nb_cmd)
 	{
 		if (cmd[index_cmd].args != NULL)
 			ft_free_strs(cmd[index_cmd].args);
-		if (cmd[index_cmd].name_in != NULL)
-			free(cmd[index_cmd].name_in);
-		if (cmd[index_cmd].name_out != NULL)
-			free(cmd[index_cmd].name_out);
+		if (cmd[index_cmd].redirection != NULL)
+			ft_free_strs(cmd[index_cmd].redirection);
+		if (cmd[index_cmd].redirect_op != NULL)
+			ft_free_strs(cmd[index_cmd].redirect_op);
 		index_cmd++;
 	}
 	free(cmd);

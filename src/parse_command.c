@@ -22,26 +22,23 @@ static int	destroy_command(t_cmd *cmd, size_t nb_cmd, char ***command_redirect)
 static int	parse_infile(t_cmd *cmd, size_t *index_args,
 	char ***command_redirect)
 {
-	if (command_redirect[cmd[0].index_cmd][*index_args][1] == '<')
-		cmd[cmd[0].index_cmd].redirect_in = DOUBLE_REDIRECTION;
-	else
-		cmd[cmd[0].index_cmd].redirect_in = SIMPLE_REDIRECTION;
+	cmd[cmd[0].index_cmd].redirect_op = add_arg_to_args(cmd[cmd[0].index_cmd].redirect_op, command_redirect[cmd[0].index_cmd][*index_args]);
+	if (cmd[cmd[0].index_cmd].redirect_op == NULL)
+		return (-1);
 	(*index_args)++;
 	if (command_redirect[cmd[0].index_cmd][*index_args] == NULL
 		|| ft_ischarset(*command_redirect[cmd[0].index_cmd][*index_args], "<>") == 1)
 	{
-		if (cmd[cmd[0].index_cmd].redirect_in == DOUBLE_REDIRECTION)
+		if (cmd[cmd[0].index_cmd].redirect_op[ft_strslen((const char **)cmd[cmd[0].index_cmd].redirect_op) - 1][1] == '<')
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `<<'", 0);
 		else
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `<'", 0);
 		g_exit_status = 2;
 		return (-1);
 	}
-	if (cmd[cmd[0].index_cmd].name_in != NULL)
-		free(cmd[cmd[0].index_cmd].name_in);
-	cmd[cmd[0].index_cmd].name_in = ft_strdup(
-			command_redirect[cmd[0].index_cmd][*index_args]);
-	if (cmd[cmd[0].index_cmd].name_in == NULL)
+	cmd[cmd[0].index_cmd].redirection = add_arg_to_args(
+			cmd[cmd[0].index_cmd].redirection, command_redirect[cmd[0].index_cmd][*index_args]);
+	if (cmd[cmd[0].index_cmd].redirection == NULL)
 		return (-1);
 	return (0);
 }
@@ -49,28 +46,26 @@ static int	parse_infile(t_cmd *cmd, size_t *index_args,
 static int	parse_outfile(t_cmd *cmd, size_t *index_args,
 	char ***command_redirect)
 {
-	if (command_redirect[cmd[0].index_cmd][*index_args][1] == '>')
-		cmd[cmd[0].index_cmd].redirect_out = DOUBLE_REDIRECTION;
-	else
-		cmd[cmd[0].index_cmd].redirect_out = SIMPLE_REDIRECTION;
+	cmd[cmd[0].index_cmd].redirect_op = add_arg_to_args(cmd[cmd[0].index_cmd].redirect_op, command_redirect[cmd[0].index_cmd][*index_args]);
+	if (cmd[cmd[0].index_cmd].redirect_op == NULL)
+		return (-1);
 	(*index_args)++;
 	if (command_redirect[cmd[0].index_cmd][*index_args] == NULL
 		|| ft_ischarset(*command_redirect[cmd[0].index_cmd][*index_args], "<>") == 1)
 	{
-		if (cmd[cmd[0].index_cmd].redirect_out == DOUBLE_REDIRECTION)
+		if (cmd[cmd[0].index_cmd].redirect_op[ft_strslen((const char **)cmd[cmd[0].index_cmd].redirect_op) - 1][1] == '>')
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `>>'", 0);
 		else
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `>'", 0);
 		g_exit_status = 2;
 		return (-1);
 	}
-	if (cmd[cmd[0].index_cmd].name_out != NULL)
-		free(cmd[cmd[0].index_cmd].name_out);
-	cmd[cmd[0].index_cmd].name_out = ft_strdup(
-			command_redirect[cmd[0].index_cmd][*index_args]);
-	if (cmd[cmd[0].index_cmd].name_out == NULL)
+	cmd[cmd[0].index_cmd].redirection = add_arg_to_args(
+			cmd[cmd[0].index_cmd].redirection, command_redirect[cmd[0].index_cmd][*index_args]);
+	if (cmd[cmd[0].index_cmd].redirection == NULL)
 		return (-1);
 	return (0);
+
 }
 
 static char	*expand_arg(t_cmd *cmd, size_t index_args,

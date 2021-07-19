@@ -12,18 +12,6 @@
 
 #include "minishell.h"
 
-static void	trim_spaces(char **str)
-{
-	size_t	i;
-
-	while (**str == ' ')
-		(*str)++;
-	i = ft_strlen(*str) - 1;
-	while ((*str)[i] == ' ')
-		i--;
-	(*str)[i + 1] = 0;
-}
-
 t_bool	add_var(t_var **list, char *name, char *value)
 {
 	t_var	*new_var;
@@ -33,7 +21,6 @@ t_bool	add_var(t_var **list, char *name, char *value)
 		return (FALSE);
 	if (check_var_exist(*list, name))
 		return (set_var(*list, name, value));
-	trim_spaces(&value);
 	new_var = make_var(name, value);
 	if (!new_var)
 		return (FALSE);
