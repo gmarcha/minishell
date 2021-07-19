@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-volatile int g_exit_status = 0;
+volatile int	g_exit_status = 0;
 
 void	sig_handler(int sig)
 {
@@ -37,6 +37,35 @@ int	sig_init(void)
 	if (signal(SIGQUIT, sig_handler) == SIG_ERR)
 		return (0);
 	return (1);
+}
+
+static int	minishell_init(t_var **env)
+{
+	char		*pwd;
+
+	if (*(char *)get_var(*env, "PWD") == '\0')
+	{
+		pwd = getcwd(NULL, 0);
+		if (pwd == NULL)
+		{
+			clear_list(env);
+			return (EXIT_FAILURE);
+		}
+		if (add_var(env, "PWD", pwd) == FALSE)
+		{
+			free(pwd);
+			clear_list(env);
+			return (EXIT_FAILURE);
+		}
+		if (add_var(env, "OLDPWD", pwd) == FALSE)
+		{
+			free(pwd);
+			clear_list(env);
+			return (EXIT_FAILURE);
+		}
+		free(pwd);
+	}
+	return (EXIT_SUCCESS);
 }
 
 static void	minishell_loop(t_var **env)
@@ -69,34 +98,14 @@ int	main(int ac, char *av[], char **envp)
 	env = construct_globals(envp);
 	if (*(char *)get_var(env, "PATH") == '\0')
 	{
-		if (add_var(&env, "PATH", "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin") == FALSE)
+		if (add_var(&env, "PATH", DEFAULT_PATH) == FALSE)
 		{
 			clear_list(&env);
 			return (EXIT_FAILURE);
 		}
 	}
-	if (*(char *)get_var(env, "PWD") == '\0')
-	{
-		char		*pwd = getcwd(NULL, 0);
-		if (pwd == NULL)
-		{
-			clear_list(&env);
-			return (EXIT_FAILURE);
-		}
-		if (add_var(&env, "PWD", pwd) == FALSE)
-		{
-			free(pwd);
-			clear_list(&env);
-			return (EXIT_FAILURE);
-		}
-		if (add_var(&env, "OLDPWD", pwd) == FALSE)
-		{
-			free(pwd);
-			clear_list(&env);
-			return (EXIT_FAILURE);
-		}
-		free(pwd);
-	}
+	if (minishell_init(&env) == EXIT_FAILURE)
+		return (EXIT_FAILURE);
 	minishell_loop(&env);
 	ft_putstr_fd("exit\n", 2);
 	clear_list(&env);

@@ -19,7 +19,7 @@ void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 
 	close_cmd_fd(cmd, cmd[0].nb_cmd);
 	if (cmd[index_cmd].args == NULL)
-		destroy_process(cmd, cmd[0].nb_cmd, env, 0);
+		destroy_process(cmd, cmd[0].nb_cmd, env, 1);
 	ret = execute_builtin(cmd, index_cmd, env, exit_status);
 	if (ret >= 0)
 		destroy_process(cmd, cmd[0].nb_cmd, env, ret);

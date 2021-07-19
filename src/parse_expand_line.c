@@ -56,7 +56,6 @@ static t_node	*expand_dollar(char **line_ptr, t_var *var_list, int exit_code,
 	ft_strlcpy(var_name, *line_ptr, i + 1);
 	if (!check_var_name(var_name))
 		return (new_node('$', NULL, FALSE));
-	node = new_node(0, get_var(var_list, var_name), FALSE);
 	(*line_ptr) += i;
 	if (in_quote)
 		return (new_node(0, get_var(var_list, var_name), FALSE));

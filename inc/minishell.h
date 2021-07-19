@@ -22,6 +22,8 @@
 
 # define PROGRAM_NAME	"minishell"
 # define PROMPT			"\033[35m§¬ \033[36mminishell-42 \033[33mŸ \033[0m"
+# define DEFAULT_PATH	"/usr/local/sbin:/usr/local/bin: \
+						/usr/sbin:/usr/bin:/sbin:/bin"
 
 # define EMPTY_STR		""
 
@@ -96,6 +98,10 @@ t_cmd	*create_command(size_t nb_cmd, char ***command_redirect);
 char	*expand_line(char *line_content, t_var *env, int exit_status);
 char	*trim_spaces(char *str);
 char	**expand_redirect_op(char **command_list, size_t nb_cmd);
+int		parse_infile(t_cmd *cmd, size_t i, size_t *index_args,
+			char ***command_redirect);
+int		parse_outfile(t_cmd *cmd, size_t i, size_t *index_args,
+			char ***command_redirect);
 char	*handle_unclosed_quotes(char **line);
 int		is_line_not_empty(char *line_expand);
 t_cmd	*parse_line(char **line, t_var *env);

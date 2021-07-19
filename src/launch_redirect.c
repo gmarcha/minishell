@@ -68,7 +68,8 @@ static int	redirect_input(t_cmd *cmd, size_t index_cmd, size_t i, t_var *env)
 	if (cmd[index_cmd].redirect_op[i][1] == '\0')
 		cmd[index_cmd].fd_in = open(cmd[index_cmd].redirection[i], O_RDONLY);
 	else if (cmd[index_cmd].redirect_op[i][1] == '<')
-		cmd[index_cmd].fd_in = heredoc(cmd[index_cmd].redirection[i], env, g_exit_status);
+		cmd[index_cmd].fd_in = heredoc(
+				cmd[index_cmd].redirection[i], env, g_exit_status);
 	if (cmd[index_cmd].fd_in == -1)
 	{
 		p_error(PROGRAM_NAME, cmd[index_cmd].redirection[i], errno);
@@ -104,7 +105,8 @@ int	redirect(t_cmd *cmd, size_t index_cmd, t_var **env)
 	size_t			i;
 
 	i = 0;
-	while (cmd[index_cmd].redirection != NULL && cmd[index_cmd].redirection[i] != NULL)
+	while (cmd[index_cmd].redirection != NULL
+		&& cmd[index_cmd].redirection[i] != NULL)
 	{
 		if (*cmd[index_cmd].redirect_op[i] == '<')
 		{
@@ -112,21 +114,15 @@ int	redirect(t_cmd *cmd, size_t index_cmd, t_var **env)
 				return (-1);
 		}
 		else if (*cmd[index_cmd].redirect_op[i] == '>')
-		{
 			if (redirect_output(cmd, index_cmd, i, *env) != 0)
 				return (-1);
-		}
 		i++;
 	}
 	if (index_cmd != 0 || cmd[index_cmd].redirection != NULL)
-	{
 		if (dup2(cmd[index_cmd].fd_in, STDIN_FILENO) == -1)
 			return (-1);
-	}
 	if (index_cmd < cmd[0].nb_cmd - 1 || cmd[index_cmd].redirection != NULL)
-	{
 		if (dup2(cmd[index_cmd].fd_out, STDOUT_FILENO) == -1)
 			return (-1);
-	}
 	return (0);
 }

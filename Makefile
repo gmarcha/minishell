@@ -40,6 +40,7 @@ SRC			=	src/builtin_cd.c \
 				src/parse_expand_line_utils.c \
 				src/parse_expand_line.c \
 				src/parse_expand_redirect_op.c \
+				src/parse_file.c \
 				src/parse_handle_unclosed_quotes.c \
 				src/parse_is_line_not_empty.c \
 				src/parse_line.c \
