@@ -31,9 +31,13 @@ void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 		ft_free_strs(envp);
 		destroy_process(cmd, cmd[0].nb_cmd, env, 1);
 	}
+	errno = 0;
 	if (execve(cmd[index_cmd].args[0], cmd[index_cmd].args, envp) == -1)
 	{
-		p_error(cmd[index_cmd].args[0], "command not found", 0);
+		if (errno == EACCES)
+			p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errno);
+		else
+			p_error(cmd[index_cmd].args[0], "command not found", 0);
 		ft_free_strs(envp);
 		destroy_process(cmd, cmd[0].nb_cmd, env, 127);
 	}
