@@ -34,8 +34,11 @@ void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 	errno = 0;
 	if (execve(cmd[index_cmd].args[0], cmd[index_cmd].args, envp) == -1)
 	{
-		if (errno == EACCES)
+		// t_stat		file_desc;
+
+		if (errno != 0)
 			p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errno);
+		// stat(cmd[index_cmd].args[0], &file_desc);
 		else
 			p_error(cmd[index_cmd].args[0], "command not found", 0);
 		ft_free_strs(envp);

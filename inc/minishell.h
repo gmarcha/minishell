@@ -10,6 +10,7 @@
 # include <signal.h>
 # include <errno.h>
 # include <sys/wait.h>
+# include <sys/stat.h>
 # include <readline/readline.h>
 # include <readline/history.h>
 
@@ -34,6 +35,8 @@
 # define CD_HOME_ERROR	"HOME not set"
 
 extern volatile int	g_exit_status;
+
+typedef struct stat	t_stat;
 
 typedef enum e_redirect_op
 {
