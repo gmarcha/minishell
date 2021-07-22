@@ -16,17 +16,27 @@ static void	fail_command(t_cmd *cmd, size_t index_cmd, t_var **env, char **envp)
 {
 	t_stat		file_desc;
 	int			errnum;
+	int			exit_code;
 
+	exit_code = 127;
 	errnum = errno;
 	if (stat(cmd[index_cmd].args[0], &file_desc) == 0
 		&& S_ISDIR(file_desc.st_mode))
+	{
+		exit_code = 126;
 		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], EISDIR);
+	}
 	else if (errnum != ENOENT)
+	{
+		exit_code = 126;
+		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errnum);
+	}
+	else if (errnum == ENOENT && ft_strchr(cmd[index_cmd].args[0], '/') != NULL)
 		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errnum);
 	else
 		p_error(cmd[index_cmd].args[0], "command not found", 0);
 	ft_free_strs(envp);
-	destroy_process(cmd, cmd[0].nb_cmd, env, 127);
+	destroy_process(cmd, cmd[0].nb_cmd, env, exit_code);
 }
 
 void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
