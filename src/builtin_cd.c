@@ -6,7 +6,7 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/08 18:08:12 by qdam              #+#    #+#             */
-/*   Updated: 2021/07/19 16:57:15 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/07/22 12:10:31 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,27 @@ static int	show_error_cd(char *path, char *msg)
 	return (1);
 }
 
+static int	proceed_cd(char *dir, t_var *var_list)
+{
+	char	*from;
+	char	*to;
+
+	from = getcwd(NULL, 0);
+	if (chdir(dir))
+	{
+		free(from);
+		return (show_error_cd(dir, CD_DIR_ERROR));
+	}
+	to = getcwd(NULL, 0);
+	add_var(&var_list, "OLDPWD", from);
+	add_var(&var_list, "PWD", to);
+	free(from);
+	free(to);
+	return (0);
+}
+
 int	mini_cd(char **args, t_var *var_list)
 {
-	char	*cwd;
 	char	**home_args;
 
 	if (!args || (args[0] && args[0][0] == 0))
@@ -36,11 +54,5 @@ int	mini_cd(char **args, t_var *var_list)
 	}
 	if (args[1])
 		return (show_error_cd(NULL, CD_ARG_ERROR));
-	if (chdir(args[0]))
-		return (show_error_cd(args[0], CD_DIR_ERROR));
-	cwd = getcwd(NULL, 0);
-	add_var(&var_list, "OLDPWD", get_var(var_list, "PWD"));
-	add_var(&var_list, "PWD", cwd);
-	free(cwd);
-	return (0);
+	return (proceed_cd(args[0], var_list));
 }
