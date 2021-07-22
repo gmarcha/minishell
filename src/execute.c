@@ -12,6 +12,23 @@
 
 #include "minishell.h"
 
+static void	fail_command(t_cmd *cmd, size_t index_cmd, t_var **env, char **envp)
+{
+	t_stat		file_desc;
+	int			errnum;
+
+	errnum = errno;
+	if (stat(cmd[index_cmd].args[0], &file_desc) == 0
+		&& S_ISDIR(file_desc.st_mode))
+		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], EISDIR);
+	else if (errnum != ENOENT)
+		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errnum);
+	else
+		p_error(cmd[index_cmd].args[0], "command not found", 0);
+	ft_free_strs(envp);
+	destroy_process(cmd, cmd[0].nb_cmd, env, 127);
+}
+
 void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 {
 	char			**envp;
@@ -33,15 +50,5 @@ void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 	}
 	errno = 0;
 	if (execve(cmd[index_cmd].args[0], cmd[index_cmd].args, envp) == -1)
-	{
-		// t_stat		file_desc;
-
-		if (errno != 0)
-			p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errno);
-		// stat(cmd[index_cmd].args[0], &file_desc);
-		else
-			p_error(cmd[index_cmd].args[0], "command not found", 0);
-		ft_free_strs(envp);
-		destroy_process(cmd, cmd[0].nb_cmd, env, 127);
-	}
+		fail_command(cmd, index_cmd, env, envp);
 }
