@@ -6,31 +6,44 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 10:14:07 by qdam              #+#    #+#             */
-/*   Updated: 2021/07/14 22:59:08 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/07/22 16:19:30 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+static t_bool	is_option_n(char *arg)
+{
+	if (ft_strlen(arg) < 2)
+		return (FALSE);
+	if (*(arg++) != '-')
+		return (FALSE);
+	while (*arg)
+		if (*(arg++) != 'n')
+			return (FALSE);
+	return (TRUE);
+}
+
 int	mini_echo(char **args)
 {
-	int	first;
-	int	i;
+	t_bool	no_nl;
 
-	if (*args == NULL)
-		first = -1;
-	else if (ft_strncmp("-n", args[0], 3))
-		first = 0;
-	else
-		first = 1;
-	i = first;
-	while (i != -1 && args[i])
+	no_nl = FALSE;
+	if (args && *args)
 	{
-		ft_putstr_fd(args[i], STDOUT_FILENO);
-		if (args[++i])
-			ft_putchar_fd(' ', STDOUT_FILENO);
+		while (is_option_n(*args))
+		{
+			no_nl = TRUE;
+			args++;
+		}
+		while (*args)
+		{
+			ft_putstr_fd(*args, STDOUT_FILENO);
+			if (*(++args))
+				ft_putchar_fd(' ', STDOUT_FILENO);
+		}
 	}
-	if (first != 1)
+	if (no_nl == FALSE)
 		ft_putchar_fd('\n', STDOUT_FILENO);
 	return (0);
 }

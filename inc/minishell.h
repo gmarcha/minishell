@@ -30,7 +30,6 @@
 
 # define EXIT_ARG_ERROR	": numeric argument required"
 # define ENV_NAME_ERROR	"': not a valid identifier"
-# define CD_DIR_ERROR	": No such file or directory"
 # define CD_ARG_ERROR	"too many arguments"
 # define CD_HOME_ERROR	"HOME not set"
 
