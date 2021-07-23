@@ -12,7 +12,7 @@
 
 #include "minishell.h"
 
-volatile int	g_exit_status = 0;
+volatile t_data	g_data = {.exit_status = 0, .is_execution = 0};
 
 void	sig_handler(int sig)
 {
@@ -21,8 +21,9 @@ void	sig_handler(int sig)
 		write(1, "\n", 1);
 		rl_on_new_line();
 		rl_replace_line("", 0);
-		rl_redisplay();
-		g_exit_status = 130;
+		if (g_data.is_execution == 0)
+			rl_redisplay();
+		g_data.exit_status = 130;
 	}
 	else if (sig == SIGQUIT)
 	{
@@ -80,7 +81,7 @@ static void	minishell_loop(t_var **env)
 		cmd = parse_line(&line, *env);
 		if (cmd != NULL)
 		{
-			g_exit_status = launch(cmd, env, g_exit_status);
+			g_data.exit_status = launch(cmd, env, g_data.exit_status);
 			free_cmd(cmd, cmd[0].nb_cmd);
 		}
 		line = line_read(line, PROMPT);
@@ -109,5 +110,5 @@ int	main(int ac, char *av[], char **envp)
 	minishell_loop(&env);
 	ft_putstr_fd("exit\n", 2);
 	clear_list(&env);
-	return (g_exit_status);
+	return (g_data.exit_status);
 }

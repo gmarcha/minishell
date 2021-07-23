@@ -25,7 +25,7 @@ static char	*expand_arg(t_cmd *cmd, size_t index_args,
 	char			*expanse;
 
 	expanse = expand_line(command_redirect[cmd[0].index_cmd][index_args],
-			env, g_exit_status);
+			env, g_data.exit_status);
 	if (expanse == NULL)
 		return (NULL);
 	free(command_redirect[cmd[0].index_cmd][index_args]);

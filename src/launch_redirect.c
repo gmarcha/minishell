@@ -32,7 +32,7 @@ static char	*expand_file(char **filename, t_var *env)
 	char			*expanse;
 	char			*tmp;
 
-	expanse = expand_line(*filename, env, g_exit_status);
+	expanse = expand_line(*filename, env, g_data.exit_status);
 	if (expanse == NULL)
 		return (NULL);
 	if (*expanse == '\0' || is_ambiguous(expanse) == -1)
@@ -44,7 +44,7 @@ static char	*expand_file(char **filename, t_var *env)
 			return (NULL);
 		}
 		p_error(PROGRAM_NAME, tmp, 0);
-		g_exit_status = 1;
+		g_data.exit_status = 1;
 		free(tmp);
 		free(expanse);
 		return (NULL);
@@ -69,7 +69,7 @@ static int	redirect_input(t_cmd *cmd, size_t index_cmd, size_t i, t_var *env)
 		cmd[index_cmd].fd_in = open(cmd[index_cmd].redirection[i], O_RDONLY);
 	else if (cmd[index_cmd].redirect_op[i][1] == '<')
 		cmd[index_cmd].fd_in = heredoc(
-				cmd[index_cmd].redirection[i], env, g_exit_status);
+				cmd[index_cmd].redirection[i], env, g_data.exit_status);
 	if (cmd[index_cmd].fd_in == -1)
 	{
 		p_error(PROGRAM_NAME, cmd[index_cmd].redirection[i], errno);

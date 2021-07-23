@@ -79,6 +79,7 @@ int	launch(t_cmd *cmd, t_var **env, int exit_status)
 	size_t			index_cmd;
 	int				ret;
 
+	g_data.is_execution = 1;
 	index_cmd = -1;
 	while (++index_cmd < cmd[0].nb_cmd)
 	{

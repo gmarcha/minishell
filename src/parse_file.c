@@ -28,7 +28,7 @@ int	parse_infile(t_cmd *cmd, size_t i, size_t *index_args,
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `<<'", 0);
 		else
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `<'", 0);
-		g_exit_status = 2;
+		g_data.exit_status = 2;
 		return (-1);
 	}
 	cmd[i].redirection = add_arg_to_args(
@@ -54,7 +54,7 @@ int	parse_outfile(t_cmd *cmd, size_t i, size_t *index_args,
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `>>'", 0);
 		else
 			p_error(PROGRAM_NAME, "syntax error near unexpected token `>'", 0);
-		g_exit_status = 2;
+		g_data.exit_status = 2;
 		return (-1);
 	}
 	cmd[i].redirection = add_arg_to_args(

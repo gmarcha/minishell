@@ -69,13 +69,13 @@ int	is_line_not_empty(char *line_expand)
 	{
 		if (is_line_valid(line_expand, &status, &pos) == -1)
 		{
-			g_exit_status = 2;
+			g_data.exit_status = 2;
 			return (-1);
 		}
 	}
 	if (status == 0)
 	{
-		g_exit_status = 2;
+		g_data.exit_status = 2;
 		return (handling_error_pipeline(line_expand));
 	}
 	return (0);
