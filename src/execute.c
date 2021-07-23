@@ -42,10 +42,8 @@ static void	fail_command(t_cmd *cmd, size_t index_cmd, t_var **env, char **envp)
 		exit_code = 126;
 		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errnum);
 	}
-	else if (errnum == ENOENT)
-		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errnum);
 	else
-		p_error(cmd[index_cmd].args[0], "command not found", 0);
+		p_error(PROGRAM_NAME, cmd[index_cmd].args[0], errnum);
 	ft_free_strs(envp);
 	destroy_process(cmd, cmd[0].nb_cmd, env, exit_code);
 }
