@@ -30,7 +30,7 @@ static void	fail_command(t_cmd *cmd, size_t index_cmd, t_var **env, char **envp)
 	int			exit_code;
 
 	exit_code = 127;
-	errnum = errno;
+	errnum = errno;							
 	if (stat(cmd[index_cmd].args[0], &file_desc) == 0
 		&& S_ISDIR(file_desc.st_mode))
 	{
@@ -55,7 +55,7 @@ void	execute(t_cmd *cmd, size_t index_cmd, t_var **env, int exit_status)
 
 	close_cmd_fd(cmd, cmd[0].nb_cmd);
 	if (cmd[index_cmd].args == NULL)
-		destroy_process(cmd, cmd[0].nb_cmd, env, 1);
+		destroy_process(cmd, cmd[0].nb_cmd, env, 0);
 	ret = execute_builtin(cmd, index_cmd, env, exit_status);
 	if (ret >= 0)
 		destroy_process(cmd, cmd[0].nb_cmd, env, ret);
