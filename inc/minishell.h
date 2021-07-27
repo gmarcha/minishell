@@ -33,24 +33,14 @@
 # define CD_ARG_ERROR	"too many arguments"
 # define CD_HOME_ERROR	"HOME not set"
 
-typedef struct stat	t_stat;
-
-extern volatile int	g_exit_status;
-
 typedef struct s_data
 {
 	int				exit_status;
 	int				is_execution;
 }					t_data;
 
-extern volatile t_data g_data;
-
-typedef enum e_redirect_op
-{
-	NO_REDIRECTION,
-	SIMPLE_REDIRECTION,
-	DOUBLE_REDIRECTION
-}					t_redirect_op;
+extern volatile	t_data
+					g_data;
 
 typedef struct s_cmd
 {
@@ -135,7 +125,8 @@ t_bool	check_var_exist(t_var *list, char *name);
 int		mini_cd(char **args, t_var *var_list);
 int		mini_echo(char **args);
 int		mini_env(char **args, t_var *var_list);
-int		mini_exit(char **args, t_var **var_list_ptr, int exit_status);
+int		mini_exit(char **args, t_var **var_list_ptr, int exit_status,
+			t_bool one_cmd);
 int		mini_export(char **args, t_var **var_list_ptr);
 int		export_only(t_var *var_list);
 int		mini_pwd(char **args, t_var *var_list);
