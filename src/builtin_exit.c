@@ -6,7 +6,7 @@
 /*   By: gamarcha <gamarcha@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/05 09:42:59 by qdam              #+#    #+#             */
-/*   Updated: 2021/07/15 13:00:28 by gamarcha         ###   ########.fr       */
+/*   Updated: 2021/07/27 16:37:48 by gamarcha         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,13 @@ static void	show_error_exit(char *wrong_num)
 	ft_putendl_fd(EXIT_ARG_ERROR, STDERR_FILENO);
 }
 
-int	mini_exit(char **args, t_var **var_list_ptr, int exit_status)
+int	mini_exit(char **args, t_var **var_list_ptr, int exit_status,
+	t_bool one_cmd)
 {
 	unsigned char	code;
 
-	ft_putstr_fd("exit\n", STDERR_FILENO);
+	if (one_cmd)
+		ft_putstr_fd("exit\n", STDERR_FILENO);
 	if (!args || !(*args))
 		code = exit_status;
 	else if ((*args[0] == '-' && ft_isnum(args[0] + 1))

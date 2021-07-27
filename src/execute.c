@@ -25,12 +25,12 @@ static void	is_command(t_cmd *cmd, size_t index_cmd, t_var **env, char **envp)
 
 static void	fail_command(t_cmd *cmd, size_t index_cmd, t_var **env, char **envp)
 {
-	t_stat		file_desc;
-	int			errnum;
-	int			exit_code;
+	struct stat		file_desc;
+	int				errnum;
+	int				exit_code;
 
 	exit_code = 127;
-	errnum = errno;							
+	errnum = errno;
 	if (stat(cmd[index_cmd].args[0], &file_desc) == 0
 		&& S_ISDIR(file_desc.st_mode))
 	{
