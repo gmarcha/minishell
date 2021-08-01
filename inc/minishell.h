@@ -29,6 +29,7 @@
 # define EMPTY_STR		""
 
 # define EXIT_ARG_ERROR	": numeric argument required"
+# define EXIT_MANY_ARGS	"too many arguments"
 # define ENV_NAME_ERROR	"': not a valid identifier"
 # define CD_ARG_ERROR	"too many arguments"
 # define CD_HOME_ERROR	"HOME not set"
